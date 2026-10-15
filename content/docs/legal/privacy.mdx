@@ -3,7 +3,7 @@ title: Privacy Notice
 description: What Everstrat collects when you use the website, the app or these docs, why we collect it, who receives it, and how to have it deleted.
 ---
 
-Last updated: 14 September 2026
+Last updated: 15 October 2026
 
 This policy covers three websites: **everstrat.xyz**, **app.everstrat.xyz** and **docs.everstrat.xyz**.
 
@@ -31,6 +31,7 @@ We collect very little, and most of it is optional.
 - We never send your wallet address to any analytics service.
 - The YouTube videos on the roadmap do not contact Google until you press play.
 - If you give us your email for launch updates, we keep the email. We do not keep your IP address.
+- If you accept an app invite, we store your wallet address against that invite, including its email address when one is attached.
 
 ## What we collect
 
@@ -68,13 +69,28 @@ The last point is worth being precise about. We do **not** store your IP address
 
 When you submit the form, your email address is also posted to a private Telegram group used by the team, so that someone sees the signup. Telegram receives the address, the time and the signup source. Telegram's handling of that message is governed by the [Telegram Privacy Policy](https://telegram.org/privacy).
 
-We use this address for one thing: to tell you when Everstrat launches. We do not sell it, rent it, or add it to any other list.
+We use the launch list to tell you when Everstrat launches. If an app invite is created for
+your email address, that address is also included in the invite record described below.
+We do not sell or rent your email address or add it to unrelated mailing lists.
 
-### Team access cookie
+<span id="team-access-cookie" className="block scroll-m-28" />
 
-Parts of app.everstrat.xyz are restricted while the project is in testing. If you enter the access password, we set a cookie named `eve_team_access` that lasts fourteen days.
+### Invite access and session cookie
 
-The cookie holds an expiry timestamp, a random value and a signature. It contains no personal data, cannot be read by scripts on the page, and is only sent back to our own server.
+Parts of app.everstrat.xyz are restricted while the project is in testing. To accept an invite,
+you provide the invite code and sign a wallet message to prove control of your wallet.
+We store your wallet address, the invite identifier and status, and the time the invite was
+claimed. If the invite has an email address attached, this links that email to your wallet.
+We use this record to manage invite access and prevent an invite being claimed by another wallet.
+
+During verification, we also store a temporary challenge record linking your wallet to the
+invite. It is consumed when verification succeeds; expired challenges are cleaned up when
+new challenges are issued.
+
+After verification, we set a cookie named `eve_invite_access` that lasts fourteen days.
+It holds a random session token rather than your wallet address or email. The server stores
+a hash of that token and its expiry against the invite record. The cookie is `HttpOnly`, so
+scripts on the page cannot read it, uses `SameSite=Strict`, and is `Secure` in production.
 
 ### Server logs
 
@@ -98,7 +114,9 @@ When you connect a wallet to app.everstrat.xyz, your wallet address becomes visi
 | Goldsky | Queries against the Everstrat subgraph |
 | WalletConnect | Connection data, if you connect through WalletConnect rather than a browser extension |
 
-We do not store your wallet address on our servers, and we do not link it to any email address or analytics record.
+Accepting an invite also stores your wallet address on our server and links it to the invite's
+email address when one is attached, as described in [Invite access and session cookie](#invite-access-and-session-cookie).
+We do not send that wallet address or email to analytics services.
 
 ### Blockchain data
 
@@ -111,7 +129,7 @@ We cannot edit it, delete it, or make it private. This is a property of public b
 | Cookie | Set by | Purpose | Lifetime |
 | --- | --- | --- | --- |
 | `_ga`, `_ga_*` | Google Analytics | Distinguishes visitors and sessions. Only set if you accept. | Up to 2 years |
-| `eve_team_access` | Everstrat | Keeps you signed in to the restricted app area | 14 days |
+| `eve_invite_access` | Everstrat | Keeps your verified invite session signed in to the restricted app area | 14 days |
 | Consent choice | Everstrat | Remembers whether you accepted or declined analytics, so we stop asking | Stored in your browser, until you clear it |
 
 The consent choice is kept in your browser's local storage rather than in a cookie, and never leaves your device.
@@ -127,7 +145,7 @@ For readers in the EU and UK, our legal bases under the GDPR are:
 | Analytics | Your consent, which you may withdraw at any time |
 | Launch updates email | Your consent, given by submitting the form |
 | Abuse-prevention hashes | Legitimate interest in keeping the signup form usable |
-| Team access cookie | Strictly necessary for a service you asked for |
+| Invite access cookie | Strictly necessary for a service you asked for |
 | Server logs | Legitimate interest in security and availability |
 
 ## How long we keep things
@@ -137,8 +155,12 @@ For readers in the EU and UK, our legal bases under the GDPR are:
 | Launch updates email | Until we send the launch announcement, or until you ask us to remove it, whichever comes first |
 | Abuse-prevention hashes | 12 months |
 | Analytics | 14 months, after which Google deletes it |
-| Team access cookie | 14 days |
+| Invite access cookie and session validity | 14 days |
+| Invite records, including wallet and any linked email | Retained beyond invite and session expiry; expiry does not automatically delete these records |
 | Server logs | As set by Vercel, currently 30 days |
+
+Clearing the invite cookie or letting the session expire does not delete the off-chain invite
+record. To request deletion of invite data, contact **ping@everstrat.xyz**.
 
 ## Withdrawing consent
 
@@ -152,7 +174,8 @@ To have your email removed from the launch list, write to **ping@everstrat.xyz**
 
 If you are in the EU or UK, you have the right to ask us for a copy of the personal data we hold about you, to have it corrected, to have it deleted, to restrict or object to how we use it, and to receive it in a portable form. Similar rights apply in several other jurisdictions.
 
-In practice the only personal data we hold that is tied to an identifiable person is an email address you gave us voluntarily. Write to **ping@everstrat.xyz** and we will act on your request within 30 days.
+This includes launch-list emails and off-chain invite records, which may link an email address
+to a wallet address. Write to **ping@everstrat.xyz** and we will act on your request within 30 days.
 
 We cannot act on requests concerning blockchain data, for the reasons given above.
 
@@ -167,7 +190,7 @@ These are every third party that receives any of it, and what each one gets:
 | Google | Analytics events, approximate location, device and browser details | Only if you accept analytics |
 | Google (YouTube) | Your IP address and its own cookies | Only if you press play on a roadmap video |
 | Telegram | Your email address, the time, and the signup source | When you join the launch list |
-| Neon | Stores the launch list database | When you join the launch list |
+| Neon | Stores the launch list and invite records, including wallet links and session-token hashes | When you join the launch list, or an invite is created or verified |
 | Vercel | Hosts all three sites and records request logs | Every visit |
 | Alchemy | Your wallet address and the chain reads the app makes | When you connect a wallet |
 | Goldsky | Subgraph queries made by the app | When you use the app |
@@ -177,7 +200,9 @@ We may also disclose data where the law requires it. If that ever happens we wil
 
 ## Where your data goes
 
-The sites are hosted by Vercel and run in its Frankfurt region. The database holding the launch list is operated by Neon. Both describe where the infrastructure runs, not where anyone is based.
+The sites are hosted by Vercel and run in its Frankfurt region. The database holding the launch
+list and invite records is operated by Neon. Both describe where the infrastructure runs,
+not where anyone is based.
 
 Google, Telegram, Vercel, Alchemy, Goldsky and WalletConnect are all capable of processing data outside the EU, including in the United States. Where required, those transfers rely on the European Commission's standard contractual clauses or an equivalent mechanism offered by the provider.
 

@@ -2,6 +2,8 @@
   "title": "Data",
   "icon": "Database",
   "pages": [
+    "subgraph-and-data-access",
+    "events-entities-and-integrations",
     "subgraph-overview",
     "indexed-contracts-and-events",
     "entities",

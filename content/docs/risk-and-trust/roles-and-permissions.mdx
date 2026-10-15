@@ -1,0 +1,78 @@
+---
+title: Roles and permissions
+description: Governance and emergency authority, registered-contract checks, and automation permissions.
+---
+
+## Registry role model
+
+Protocol role checks use Registry. Holder assignments and the timelock delay are recorded in the
+[dated deployment snapshot](/operations/current-deployments#role-holders).
+
+| Role | Main power |
+| --- | --- |
+| `ADMIN_ROLE` | Configuration, role grants, strategy registration/removal, Controller single-strategy withdrawal, unpause, UUPS upgrades |
+| `SECURITY_ROLE` | Designated pause/emergency paths, supported ERC-20 accounting removal, Whitelist signer revocation |
+| `KEEPER_ROLE` | Controller strategy work, batch pricing and processing |
+| `MINTER_ROLE` | EVE mint and burn |
+| `CONVERTER_CALLER_ROLE` | Converter wrap, unwrap, and swap calls |
+| `CONVERTER_CALLER_MANAGER_ROLE` | Manage Converter caller grants |
+
+Registry's `DEFAULT_ADMIN_ROLE` has **zero holders** at the snapshot. `ADMIN_ROLE` is
+self-administered, so zero default-admin holders does not remove governance authority.
+
+## Governance authority
+
+ADMIN can configure connector weight, queued-exit minimum, feeds, supported assets,
+strategy deposit/withdrawal weights, performance-fee rate, treasury, and keeper parameters.
+It can register or remove strategies, grant roles, unpause modules, and authorize UUPS upgrades.
+Controller 1.1.0 also accepts ADMIN or KEEPER for `withdrawFromStrategy(address,uint256)`;
+other functions retain their own checks.
+
+{/* Preserve the migration section link from the consolidated governance page. */}
+<span id="pending-protocol-migration" className="block scroll-m-28" />
+
+The governance sequence is proposal, scheduling, readiness, then execution. A DAO Safe proposal
+alone does not start the delay. Scheduling starts it, and a Ready operation still needs an
+execution transaction. The Security Safe holds the timelock's CANCELLER permission at the snapshot.
+See [Trust & governance](/risk-and-trust/trust-and-governance#the-48-hour-timelock) for the
+review window and its limits, and [Pending migration](/operations/current-deployments#pending-migration)
+for actual operation states and predecessor dependencies.
+
+## Emergency authority
+
+ADMIN or SECURITY can pause designated modules and use their designated emergency paths.
+SECURITY cannot unpause or authorize UUPS upgrades.
+
+- `StrategyManager.removeSupportedERC20()` allows ADMIN or SECURITY to exclude a token balance
+  from NAV accounting. Removing it can restore valuation availability, but reduces reported
+  backing and does not recover the excluded asset.
+- `Whitelist.removeSigner()` allows ADMIN or SECURITY to revoke an invite-voucher signer
+  while the Whitelist is enabled. SECURITY cannot add signers or disable the Whitelist.
+- Strategy `emergencyExit()` allows ADMIN or SECURITY and requires that strategy to be paused.
+  A pause or emergency call alone does not prove all assets were recovered.
+
+Pause controls are per contract. Registry pause gates its own guarded mutations. It does not
+pause peer contracts. AMM claims and eligible cancellations remain callable during pauses;
+normal entry, exit, and processing have their own pause checks.
+
+See [Operational recovery](/operations/failure-and-recovery-scenarios#operational-recovery)
+for recovery boundaries.
+
+## Contract identity is separate from roles
+
+AMM's redemption processor, ExitQueue's Controller operations, and StrategyManager's routine
+operations authenticate the **registered Controller address**. ExitQueue request insertion,
+pulling, and closure authenticate the **registered AMM address**.
+
+These are `onlyAuthContract(Auth.CONTROLLER)` or `onlyAuthContract(Auth.AMM)` checks.
+The protocol does not define separate `CONTROLLER_ROLE` or `AMM_ROLE` grants for them.
+Oracle feed management uses `ADMIN_ROLE`, with no separate oracle-manager role.
+
+## Automation permission
+
+Mimic calls the executors' `perform()` methods through an allowlisted smart account. That account
+does not itself hold `KEEPER_ROLE`; the executors hold it and recheck each action on-chain.
+See [Keepers and automation](/developers/contracts/keepers-and-automation).
+
+Sources: [Auth](https://github.com/everstrat-xyz/contracts/blob/157129b7c7f3db06275ecc6697ff0acfab3d9dbe/src/libraries/Auth.sol)
+and [Registry](https://github.com/everstrat-xyz/contracts/blob/157129b7c7f3db06275ecc6697ff0acfab3d9dbe/src/contracts/registry/Registry.sol).

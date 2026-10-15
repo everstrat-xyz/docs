@@ -1,0 +1,289 @@
+[
+  {
+    "source": "/protocol/burn-and-redemption-flow",
+    "destination": "/developers/protocol/burn-and-redemption-flow",
+    "fragments": ["entry-point", "why-slippage-matters-more-on-burn"]
+  },
+  {
+    "source": "/protocol/high-level-architecture",
+    "destination": "/developers/protocol/high-level-architecture",
+    "fragments": ["main-components", "key-relationship", "core-rule"]
+  },
+  {
+    "source": "/protocol/mint-flow",
+    "destination": "/developers/protocol/mint-flow",
+    "fragments": [
+      "contract-path",
+      "sequence",
+      "pricing-dependencies",
+      "indexed-data"
+    ]
+  },
+  {
+    "source": "/protocol/queued-redemption-lifecycle",
+    "destination": "/developers/protocol/queued-redemption-lifecycle",
+    "fragments": [
+      "lifecycle",
+      "user-versus-keeper-actions",
+      "timing-and-accounting",
+      "indexing-rule"
+    ]
+  },
+  {
+    "source": "/protocol/strategy-and-nav-model",
+    "destination": "/developers/protocol/strategy-and-nav-model",
+    "fragments": ["accounting", "strategy-allocation", "valuation-dependency"]
+  },
+  {
+    "source": "/protocol/user-lifecycle",
+    "destination": "/developers/protocol/user-lifecycle",
+    "fragments": [
+      "lifecycle-stages",
+      "indexed-outcomes",
+      "important-constraint"
+    ]
+  },
+  {
+    "source": "/contracts/amm",
+    "destination": "/developers/contracts/amm",
+    "fragments": [
+      "responsibilities",
+      "entry-points",
+      "pricing-and-dependencies",
+      "queued-exits-and-claims",
+      "authorization-and-pausing"
+    ]
+  },
+  {
+    "source": "/contracts/controller",
+    "destination": "/developers/contracts/controller",
+    "fragments": [
+      "operational-functions",
+      "deployed-version",
+      "integration-boundaries"
+    ]
+  },
+  {
+    "source": "/contracts/eve",
+    "destination": "/developers/contracts/eve",
+    "fragments": [
+      "deployed-properties",
+      "privileged-supply-functions",
+      "app-and-indexer-integration"
+    ]
+  },
+  {
+    "source": "/contracts/exit-queue",
+    "destination": "/developers/contracts/exit-queue",
+    "fragments": ["lifecycle", "accounting", "limits-and-cancellation"]
+  },
+  {
+    "source": "/contracts/interfaces-and-libraries",
+    "destination": "/developers/contracts/interfaces-and-libraries",
+    "fragments": ["strategy-contract-boundary", "shared-libraries"]
+  },
+  {
+    "source": "/contracts/keepers-and-automation",
+    "destination": "/developers/contracts/keepers-and-automation",
+    "fragments": [
+      "current-automation-architecture",
+      "w1-queue-pricing-and-processing",
+      "w2-strategy-operations",
+      "availability-and-operational-checks"
+    ]
+  },
+  {
+    "source": "/contracts/oracle",
+    "destination": "/developers/contracts/oracle",
+    "fragments": ["purpose", "permissions", "valuation-and-staleness"]
+  },
+  {
+    "source": "/contracts/overview",
+    "destination": "/developers/contracts/overview",
+    "fragments": ["contract-map"]
+  },
+  {
+    "source": "/contracts/strategy-manager",
+    "destination": "/developers/contracts/strategy-manager",
+    "fragments": [
+      "responsibilities",
+      "allocation-and-withdrawal-weights",
+      "nav-and-live-supply",
+      "removal-and-recovery",
+      "performance-fees"
+    ]
+  },
+  {
+    "source": "/app/account-details-and-activity-feed",
+    "destination": "/developers/app/account-details-and-activity-feed",
+    "fragments": [
+      "current-state-is-separate-from-history",
+      "data-sources",
+      "activity-types",
+      "eth-credited-versus-eth-claimed"
+    ]
+  },
+  {
+    "source": "/app/burn-ui",
+    "destination": "/developers/app/burn-ui",
+    "fragments": [
+      "burn-ux-responsibilities",
+      "current-write-shapes",
+      "important-detail"
+    ]
+  },
+  {
+    "source": "/app/mint-ui",
+    "destination": "/developers/app/mint-ui",
+    "fragments": [
+      "mint-ui-features",
+      "risk-acknowledgment-gate",
+      "transaction-shape"
+    ]
+  },
+  {
+    "source": "/app/overview",
+    "destination": "/developers/app/overview",
+    "fragments": [
+      "current-routes",
+      "data-and-wallet-behavior",
+      "source-boundary"
+    ]
+  },
+  {
+    "source": "/app/slippage-model",
+    "destination": "/developers/app/slippage-model",
+    "fragments": ["two-different-meanings", "ux-details"]
+  },
+  {
+    "source": "/app/transaction-modal-and-status-ux",
+    "destination": "/developers/app/transaction-modal-and-status-ux",
+    "fragments": ["sequence", "reloads-and-replacements"]
+  },
+  {
+    "source": "/app/wallet-connection-and-supported-chain",
+    "destination": "/developers/app/wallet-connection-and-supported-chain",
+    "fragments": ["current-behavior", "why-the-single-chain-assumption-matters"]
+  },
+  {
+    "source": "/data/activity-feed-mapping",
+    "destination": "/developers/data/activity-feed-mapping",
+    "fragments": ["event-first-history", "current-actions"]
+  },
+  {
+    "source": "/data/entities",
+    "destination": "/developers/data/entities",
+    "fragments": ["event-versus-current-state"]
+  },
+  {
+    "source": "/data/indexed-contracts-and-events",
+    "destination": "/developers/data/indexed-contracts-and-events",
+    "fragments": []
+  },
+  {
+    "source": "/data/query-examples",
+    "destination": "/developers/data/query-examples",
+    "fragments": ["latest-activities", "latest-redemption-requests"]
+  },
+  {
+    "source": "/data/subgraph-overview",
+    "destination": "/developers/data/subgraph-overview",
+    "fragments": [
+      "what-the-subgraph-exists-to-do",
+      "mandatory-indexed-contracts",
+      "current-deployment-target"
+    ]
+  },
+  {
+    "source": "/developers/events-entities-and-integrations",
+    "destination": "/developers/data/events-entities-and-integrations",
+    "fragments": [
+      "event-families-that-matter",
+      "entity-families-that-matter",
+      "integration-advice"
+    ]
+  },
+  {
+    "source": "/developers/subgraph-and-data-access",
+    "destination": "/developers/data/subgraph-and-data-access",
+    "fragments": [
+      "use-the-subgraph-for",
+      "use-direct-rpc-reads-for",
+      "everstrat-data-diagram"
+    ]
+  },
+  {
+    "source": "/security/roles-and-permissions",
+    "destination": "/risk-and-trust/roles-and-permissions",
+    "fragments": [
+      "registry-role-model",
+      "contract-identity-is-separate-from-roles",
+      "automation-permission"
+    ]
+  },
+  {
+    "source": "/security/failure-and-recovery-scenarios",
+    "destination": "/operations/failure-and-recovery-scenarios",
+    "fragments": ["common-scenarios", "operational-recovery"]
+  },
+  {
+    "source": "/reference/changelog-or-release-notes-strategy",
+    "destination": "/contributing/changelog-or-release-notes-strategy",
+    "fragments": ["recommended-strategy", "minimum-useful-entry"]
+  },
+  {
+    "source": "/developers/contract-addresses-and-deployments",
+    "destination": "/reference/contract-addresses",
+    "fragments": ["canonical-snapshot", "current-contracts"]
+  },
+  {
+    "source": "/operations/smart-contract-addresses",
+    "destination": "/reference/contract-addresses",
+    "fragments": ["address-table", "maintenance-rule"]
+  },
+  {
+    "source": "/risk/key-risks-and-assumptions",
+    "destination": "/risk-and-trust/key-risks",
+    "fragments": ["main-risks", "main-assumptions"]
+  },
+  {
+    "source": "/risk/smart-contract-and-operational-trust-model",
+    "destination": "/risk-and-trust/trust-and-governance",
+    "fragments": ["contract-trust-split", "operational-trust-split"]
+  },
+  {
+    "source": "/security/immutable-vs-upgradeable-components",
+    "destination": "/risk-and-trust/trust-and-governance",
+    "fragments": [
+      "immutable-core",
+      "upgradeable-management-layer",
+      "design-tradeoff"
+    ]
+  },
+  {
+    "source": "/security/trust-assumptions",
+    "destination": "/risk-and-trust/trust-and-governance",
+    "fragments": [
+      "main-assumptions",
+      "what-is-not-trustless",
+      "what-is-more-rigid"
+    ]
+  },
+  {
+    "source": "/security/audits-reviews-and-known-limitations",
+    "destination": "/risk-and-trust/security-and-audits",
+    "fragments": [
+      "current-documentation-state",
+      "known-limitations-visible-in-source"
+    ]
+  },
+  {
+    "source": "/governance/roles-permissions-and-admin-powers",
+    "destination": "/risk-and-trust/roles-and-permissions",
+    "fragments": [
+      "governance-authority",
+      "emergency-authority",
+      "pending-protocol-migration"
+    ]
+  }
+]

@@ -1,6 +1,6 @@
 ---
 title: Current deployments
-description: Ethereum mainnet addresses, exit liquidity, and governance state at block 26,179,157.
+description: Ethereum mainnet settings, exit liquidity, role holders, and governance state at block 26,179,157.
 ---
 
 ## Verification boundary
@@ -16,23 +16,11 @@ A deployed address or a merged PR is not an announcement of unrestricted access.
 
 ## Registered contracts
 
-These addresses were checked against `Registry.getContractsAndKeys()`.
-Upgradeable components are listed at their **proxy addresses**, which integrations should call.
-
-| Contract | Address |
-| --- | --- |
-| Registry | `0x46AA1bd55c19be90d8767e0C22732A7DD31D993D` |
-| EVE | `0x8FE6A43672fCa70d41e112B8426387665fD061EC` |
-| AMM | `0x42c618D9457BE7cb3b836F7FD3332E2800C48a8b` |
-| Controller proxy | `0x9097868dcbda5a630729015DE1ddeCd66d74052c` |
-| StrategyManager proxy | `0x94916ab93C669E7c734f844dB019Ce9449a3b5C9` |
-| Oracle proxy | `0xF5B0C0ab00F92f6B8DC5F6314507FACC9c610c26` |
-| ExitQueue proxy | `0x70E284502e99e150Fde1C07B4E8171ffc365423c` |
-| Converter proxy | `0xc8700441A8ca74aE5390F137bf3Dd659CaD570de` |
-| Whitelist | `0x225B517a68A869020D99F51fFf0Ab43D47Ce3B48` |
-| Timelock | `0xF0911198Ef0a4b4234546fa5F50d6d1D45091774` |
-| QueueKeeperExecutor | `0xb7D76E4334e9E23B6edFF77e0C05B07E938a090B` |
-| StrategyKeeperExecutor | `0xE94F714fbBF85c421b6FB80D3Ce0DFA20110EA29` |
+At this block, the 10 registered addresses returned by `Registry.getContractsAndKeys()`
+matched the [canonical contract-address reference](/reference/contract-addresses#core-contracts-and-keeper-executors).
+That reference also lists Registry itself and the timelock holding `ADMIN_ROLE`, for
+12 addresses in total. Upgradeable components are listed at their **proxy addresses**,
+which integrations should call.
 
 ## Live settings
 
@@ -90,7 +78,12 @@ Registration does not guarantee that a strategy is healthy, funded, or executing
 | `SECURITY_ROLE` | `0x7c128C1CF39822B4133F8E067F4bF14999c49846` |
 | `KEEPER_ROLE` | QueueKeeperExecutor and StrategyKeeperExecutor |
 | `MINTER_ROLE` | AMM and StrategyManager |
+| `CONVERTER_CALLER_ROLE` | Four registered v1 strategies [listed above](#registered-strategies) |
+| `CONVERTER_CALLER_MANAGER_ROLE` | [Converter](/reference/contract-addresses#core-contracts-and-keeper-executors) |
 | `DEFAULT_ADMIN_ROLE` | No holders |
+
+The two Converter role assignments were read through Registry's `getRoleMemberCount()`
+and `getRoleMember()` at the snapshot block: four caller holders and one manager holder.
 
 Both executors allow the Mimic caller `0x41153f0c36f8Fb5c38396573dDB487AC95a98256`.
 This is an executor caller allowlist. The account itself holds no `KEEPER_ROLE`.

@@ -76,7 +76,9 @@ The docs site is root-routed.
 
 Introduction precedes Get Started in the shared desktop/mobile page tree. Product basics live
 in Introduction, short first-use guides in Get Started, detailed app guidance in Using Everstrat,
-and formulas and queue mechanics in How Everstrat Works. Contributor material lives in Contributing.
+and formulas and queue mechanics in How Everstrat Works. Developers contains Protocol, Contracts,
+App, and Data subsections. Risk & Trust owns risks, governance permissions, and security coverage;
+Operations owns deployment snapshots and recovery procedures. Contributor policies live in Contributing.
 
 Consolidated product and contributor pages are removed from `content/docs`, not merely hidden
 from navigation. `next.config.mjs` preserves their old page, `/docs/*`, Markdown export, and
@@ -179,6 +181,7 @@ Default local URL:
 
 ```bash
 bun run docs:gen
+bun run diagrams:gen
 bun run test:docs
 bun run test:content
 bun run lint
@@ -219,7 +222,7 @@ and Markdown/LLM exports remain useful without the figure.
 | `queue` | `/how-everstrat-works/redemption-queue` |
 | `nav` | `/how-everstrat-works/eve-and-nav` |
 | `strategies` | `/how-everstrat-works/strategies-and-yield` |
-| `data` | `/developers/subgraph-and-data-access` |
+| `data` | `/developers/data/subgraph-and-data-access` |
 
 `bun run diagrams:gen` regenerates the self-contained HTML previews in
 `public/diagrams/` from the same definitions, renderer, and stylesheet. Run it after

@@ -32,7 +32,12 @@ When redeploying contracts:
 
 1. Update `everstrat-xyz/app/subgraph/config/deployments/mainnet.json` with the new addresses
    and `startBlock`.
-2. Run `npm run config:sync` (or any of `codegen`/`build` which invoke it) to regenerate
-   `src/config.ts`.
-3. Update `everstrat-xyz/app/src/config/index.ts` `CONFIG.CONTRACTS` to match — the two files
-   are expected to agree exactly.
+2. From `everstrat-xyz/app/subgraph`, run `npm run config:sync` (or `npm run codegen` /
+   `npm run build`, which invoke it) to regenerate `src/config.ts`.
+3. Rebuild the app and subgraph with the updated deployment configuration.
+   `everstrat-xyz/app/src/config/index.ts` imports the same `mainnet.json` and maps its
+   `contracts` entries to `CONFIG.CONTRACTS`; existing address values do not need to be
+   copied into the app configuration by hand.
+
+If a new contract type is added, update the app's `CONFIG.CONTRACTS` mapping as needed and
+the subgraph configuration and indexing code that consume it.

@@ -9,6 +9,9 @@ description: Capital, valuation, governance, liquidity, and automation risks for
   more than you can afford to lose entirely.
 </Callout>
 
+{/* Preserve published section links from the consolidated risk page. */}
+<span id="main-risks" className="block scroll-m-28" />
+
 ## NAV and capital losses
 
 EVE's redemption price follows net NAV per live share. Strategy losses, token price changes,
@@ -89,3 +92,13 @@ not guaranteed payouts or proof of profit.
 
 No completed independent audit report was verified in this repository review.
 See [Security & audits](/risk-and-trust/security-and-audits).
+
+<span id="main-assumptions" className="block scroll-m-28" />
+
+## Operational assumptions
+
+Pricing relies on accurate strategy NAV and available keeper execution. App and indexing
+operators must maintain the intended mainnet deployment, environment configuration, and data
+endpoint. These dependencies are explained in
+[Operational trust](/risk-and-trust/trust-and-governance#operational-trust). Recovery procedures
+live in [Operations](/operations/failure-and-recovery-scenarios).

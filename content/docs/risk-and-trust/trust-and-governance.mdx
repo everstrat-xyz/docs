@@ -1,12 +1,15 @@
 ---
 title: Trust & governance
-description: Live role holders, governance authority, immutable code, and the limits of the timelock.
+description: Contract and operational trust, immutable code, and the limits of the timelock.
 ---
 
 <Callout type="warn" title="Experimental mainnet deployment">
   Entry is invite-gated. Deposits are real ETH at risk, and unrestricted launch should not
   be inferred from deployed contracts. Do not deposit more than you can afford to lose entirely.
 </Callout>
+
+{/* Preserve published section links from the consolidated trust/security pages. */}
+<span id="main-assumptions" className="block scroll-m-28" />
 
 ## What you are trusting
 
@@ -16,20 +19,11 @@ not principal protection or a guaranteed opportunity to exit before an upgrade.
 
 ## Role model
 
-| Role | Authority | Holder at the dated snapshot |
-| --- | --- | --- |
-| ADMIN | Parameters, peer registration, role management, strategy registration/removal, single-strategy Controller withdrawal, oracle configuration, unpausing, and UUPS upgrades | Timelock |
-| SECURITY | Designated pause/emergency paths, supported ERC-20 accounting removal, and Whitelist signer revocation | Security Safe |
-| KEEPER | Controller strategy operations and queue pricing/processing | The two keeper executor contracts |
-| MINTER | EVE mint and burn functions | AMM and StrategyManager |
-| CONVERTER_CALLER | Approved strategy conversions | Registered strategies |
-| CONVERTER_CALLER_MANAGER | Management of converter caller grants | Converter |
-
-Registered peer checks, such as AMM accepting processing only from Controller, are separate
-from Registry role grants. Oracle configuration requires ADMIN; there is no separate oracle-manager role.
-
-See [Roles and permissions](/security/roles-and-permissions) and the
-[dated role/address snapshot](/operations/current-deployments#role-holders).
+Governance configures and upgrades the management layer. SECURITY has designated emergency
+powers, and keeper executors coordinate strategy work and queue processing.
+The canonical [Roles and permissions](/risk-and-trust/roles-and-permissions) page defines each
+role, registered-contract checks, and their limits. Current assignments live in the
+[dated role snapshot](/operations/current-deployments#role-holders).
 
 ## The 48-hour timelock
 
@@ -46,19 +40,16 @@ returns EVE and pays no ETH.
 
 ## SECURITY limits and accounting effects
 
-SECURITY cannot unpause or authorize UUPS upgrades. It can pause designated modules,
-use their authorized emergency recovery paths, and remove a supported ERC-20 from
-StrategyManager. That removal is a configuration exception: it drops that token's value
-from NAV accounting without recovering its assets. It must not be described as
-configuration-free emergency authority. `Whitelist.removeSigner()` is another configuration
-exception: SECURITY can revoke a signer while the Whitelist is enabled, but cannot add a
-signer or disable the Whitelist.
+SECURITY can remove a supported ERC-20 from NAV accounting without recovering that asset,
+and revoke a Whitelist signer while the gate is enabled. These powers can change reported
+backing or access. See [Emergency authority](/risk-and-trust/roles-and-permissions#emergency-authority)
+for authorization, pause requirements, and limits. AMM claims and eligible cancellations remain
+available during pauses.
 
-Pausing is per contract; pausing the Registry does not pause other contracts. Strategy emergency recovery requires
-the strategy to be paused and permits ADMIN or SECURITY.
-
-Cancellation of an eligible queued request and withdrawal of already claimable ETH
-remain available through AMM during pauses.
+<span id="contract-trust-split" className="block scroll-m-28" />
+<span id="immutable-core" className="block scroll-m-28" />
+<span id="upgradeable-management-layer" className="block scroll-m-28" />
+<span id="what-is-more-rigid" className="block scroll-m-28" />
 
 ## Immutable versus upgradeable
 
@@ -68,15 +59,33 @@ remain available through AMM during pauses.
 | Each UniCL strategy | Immutable instance; replacement uses new deployment and registration |
 | Controller, StrategyManager, ExitQueue, Oracle, Converter | ADMIN-authorized UUPS upgrades |
 
+<span id="design-tradeoff" className="block scroll-m-28" />
+
 Immutable AMM code still depends on configurable peers and upgradeable NAV/queue contracts.
 Immutable strategy code still depends on feeds, routes, and external pools.
 Fixed bytecode does not make economic behavior independent of governance.
 
+<span id="operational-trust-split" className="block scroll-m-28" />
+<span id="what-is-not-trustless" className="block scroll-m-28" />
+
+## Operational trust
+
+Strategy and queue automation depend on keeper availability, configured permissions, gas,
+and reliable valuation inputs. Off-chain callers and on-chain executors have distinct
+permissions; see [Keepers and automation](/developers/contracts/keepers-and-automation).
+
+App operators must keep network and deployment configuration aligned with the contracts.
+Indexing operators maintain the Goldsky deployment and its configuration. Account history
+is eventually consistent, while balances and action eligibility are checked through RPC.
+The app assumes Ethereum mainnet and handles unsupported networks explicitly.
+See [Data access](/developers/data/subgraph-and-data-access) and
+[Failure and recovery scenarios](/operations/failure-and-recovery-scenarios).
+
 ## Current migration
 
-Controller 1.1.0 is active after 018. UniCL v2 registration and v1 removal are still separate,
-scheduled operations at the dated snapshot; they are not live merely because source is merged.
-See [Pending migration](/operations/current-deployments#pending-migration) for their
-separate deployment, scheduling, and execution states.
+At the October 12 snapshot, **Controller 1.1.0 was active** after 018 executed;
+**019 and 020 were scheduled and had not executed**. The strategy migration was still pending.
+See [Pending migration](/operations/current-deployments#pending-migration) for the block,
+ready times, and execution evidence. Becoming Ready on October 14 does not execute an operation.
 
 For review coverage, see [Security & audits](/risk-and-trust/security-and-audits).

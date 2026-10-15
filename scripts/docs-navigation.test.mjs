@@ -130,6 +130,13 @@ test("every navigation entry and internal content link resolves canonically", ()
     }
   }
   for (const path of pages) {
+    const owner = join(dirname(path), "meta.json");
+    assert.ok(existsSync(owner), `Page has no section metadata: ${path}`);
+    const slug = relative(dirname(path), path).replace(/\.mdx$/, "");
+    assert.ok(
+      JSON.parse(readFileSync(owner, "utf8")).pages.includes(slug),
+      `Unlisted page remains in search/export collection: ${path}`,
+    );
     const text = readFileSync(path, "utf8");
     const links = [
       ...text.matchAll(/\]\((\/[^)\s]+)\)/g),
@@ -147,7 +154,7 @@ test("every navigation entry and internal content link resolves canonically", ()
 
 test("old page, legacy, Markdown, and image URLs redirect directly to canonical paths", async () => {
   const redirects = await config.redirects();
-  assert.equal(redirects.length, aliases.length * 6);
+  assert.ok(redirects.length >= aliases.length * 6);
   assert.equal(
     new Set(redirects.map((rule) => rule.source)).size,
     redirects.length,
@@ -192,4 +199,184 @@ test("all seven diagram embeds and direct figure links survive consolidation", (
   ]);
   for (const name of names)
     assert.ok(text.includes(`#everstrat-${name}-diagram`));
+});
+
+test("Phase 2 has ten sections, matching home cards and four technical subsections", () => {
+  const expected = [
+    "introduction",
+    "get-started",
+    "using-everstrat",
+    "how-everstrat-works",
+    "risk-and-trust",
+    "reference",
+    "developers",
+    "operations",
+    "contributing",
+    "legal",
+  ];
+  assert.deepEqual(meta("meta.json").pages, ["index", ...expected]);
+  assert.deepEqual(meta("developers/meta.json").pages, [
+    "protocol",
+    "contracts",
+    "app",
+    "data",
+  ]);
+  const titles = expected.map((section) => meta(`${section}/meta.json`).title);
+  const cards = [...read("index.mdx").matchAll(/<Card title="([^"]+)"/g)].map(
+    (match) => match[1],
+  );
+  assert.deepEqual(cards, titles);
+  for (const old of [
+    "protocol",
+    "contracts",
+    "app",
+    "data",
+    "risk",
+    "security",
+    "governance",
+  ])
+    assert.ok(!existsSync(join(contentRoot, old, "meta.json")), old);
+});
+
+test("every previously published Phase 1 page survives or redirects directly", async () => {
+  const legacy = JSON.parse(
+    readFileSync(
+      join(root, "scripts/fixtures/docs-phase1-routes.json"),
+      "utf8",
+    ),
+  );
+  assert.equal(legacy.length, 77);
+  const redirects = await config.redirects();
+  const pageRules = redirects.filter((rule) => routes.has(rule.destination));
+  for (const rule of pageRules)
+    assert.ok(
+      !routes.has(rule.source),
+      `Superseded source remains indexed: ${rule.source}`,
+    );
+  for (const old of legacy) {
+    if (routes.has(old)) continue;
+    const rule = pageRules.find((rule) => rule.source === old);
+    assert.ok(rule, `Lost published page: ${old}`);
+    assert.ok(!routes.has(old), `Duplicate remains: ${old}`);
+  }
+  for (const rule of redirects) {
+    assert.ok(
+      !redirects.some((other) => other.source === rule.destination),
+      `Redirect chain: ${rule.source}`,
+    );
+    const target = rule.destination.startsWith("/llms.mdx/docs")
+      ? rule.destination
+          .replace("/llms.mdx/docs", "")
+          .replace(/\/content\.md$/, "") || "/"
+      : rule.destination.startsWith("/og/docs")
+        ? rule.destination
+            .replace("/og/docs", "")
+            .replace(/\/image\.webp$/, "") || "/"
+        : rule.destination;
+    assert.ok(
+      routes.has(target),
+      `Missing redirect target: ${rule.source} -> ${target}`,
+    );
+  }
+});
+
+test("technical integration pages and their diagram are inside Developers / Data", () => {
+  const data = meta("developers/data/meta.json").pages;
+  assert.ok(data.includes("events-entities-and-integrations"));
+  assert.ok(data.includes("subgraph-and-data-access"));
+  assert.ok(
+    read("developers/data/subgraph-and-data-access.mdx").includes(
+      '<DocsDiagram name="data" />',
+    ),
+  );
+  assert.ok(
+    !existsSync(
+      join(contentRoot, "developers/contract-addresses-and-deployments.mdx"),
+    ),
+  );
+});
+
+test("risk and governance retain one permission reference and recovery lives in Operations", () => {
+  assert.deepEqual(meta("risk-and-trust/meta.json").pages, [
+    "key-risks",
+    "trust-and-governance",
+    "roles-and-permissions",
+    "security-and-audits",
+  ]);
+  const roles = read("risk-and-trust/roles-and-permissions.mdx");
+  for (const required of [
+    "DEFAULT_ADMIN_ROLE",
+    "self-administered",
+    "CANCELLER",
+    "onlyAuthContract",
+    "CONVERTER_CALLER_MANAGER_ROLE",
+    "removeSupportedERC20",
+    "removeSigner",
+    "emergencyExit",
+    "allowlisted",
+  ])
+    assert.ok(roles.includes(required), required);
+  assert.ok(
+    meta("operations/meta.json").pages.includes(
+      "failure-and-recovery-scenarios",
+    ),
+  );
+  const recovery = read("operations/failure-and-recovery-scenarios.mdx");
+  for (const required of [
+    "three days",
+    "slippage",
+    "Subgraph",
+    "RPC",
+    "Operational Recovery",
+  ])
+    assert.ok(recovery.includes(required), required);
+});
+
+test("the address inventory, complete glossary, and release policy each have one owner", () => {
+  const addresses = read("reference/contract-addresses.mdx");
+  assert.equal(
+    [
+      ...addresses
+        .split("## Verification")[0]
+        .matchAll(/^\| [^|]+ \| `0x[a-fA-F0-9]{40}` \|$/gm),
+    ].length,
+    12,
+  );
+  assert.ok(addresses.includes("sync-config.mjs"));
+  const snapshot = read("operations/current-deployments.mdx");
+  assert.ok(
+    snapshot.includes(
+      "/reference/contract-addresses#core-contracts-and-keeper-executors",
+    ),
+  );
+  assert.ok(snapshot.includes("It does not refresh automatically"));
+  assert.match(
+    snapshot,
+    /10 registered addresses returned by `Registry\.getContractsAndKeys\(\)`/,
+  );
+  assert.match(snapshot, /12 addresses in total/);
+  assert.ok(
+    !existsSync(join(contentRoot, "operations/smart-contract-addresses.mdx")),
+  );
+  assert.equal(
+    pages.filter((path) =>
+      /^title: Glossary$/m.test(readFileSync(path, "utf8")),
+    ).length,
+    1,
+  );
+  assert.ok(
+    meta("contributing/meta.json").pages.includes(
+      "changelog-or-release-notes-strategy",
+    ),
+  );
+  assert.ok(
+    !existsSync(
+      join(contentRoot, "reference/changelog-or-release-notes-strategy.mdx"),
+    ),
+  );
+  assert.ok(
+    read("contributing/changelog-or-release-notes-strategy.mdx").includes(
+      "It is not a release history",
+    ),
+  );
 });

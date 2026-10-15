@@ -1,9 +1,9 @@
 ---
 title: The redemption queue, in depth
-description: Full mechanics of the ExitQueue — how your exit request is batched, priced, processed, and claimed, and what to do if things go wrong.
+description: Full mechanics of the ExitQueue, including batching, pricing, processing, claims, and recovery.
 ---
 
-<Callout type="warn" title="Testing phase — treat as a test protocol">
+<Callout type="warn" title="Testing phase: treat as a test protocol">
   Everstrat is deployed on **Ethereum mainnet** (chain id 1), but it is in a **testing phase** and
   should be treated as a **test protocol**. Entry is invite-gated and the software is experimental.
 </Callout>
@@ -13,7 +13,7 @@ This page explains the full lifecycle of a queued redemption. For the user-facin
 
 ## When does an exit go to the queue?
 
-When you call `exit()`, the AMM first checks its **free balance** — the ETH it holds minus any ETH
+When you call `exit()`, the AMM first checks its **free balance**: the ETH it holds minus any ETH
 already reserved for pending claims (`freeBalance = address(AMM).balance − lockedForClaims`). If the
 free balance is enough to pay your redemption at the current base price, the exit settles
 immediately. Otherwise your request enters **ExitQueue** and your EVE is escrowed on AMM.
@@ -47,7 +47,7 @@ economical. Immediate exits have no minimum.
     **The keeper processes each request.** For each request in the batch, the ExitQueue checks whether
     the settled price has fallen too far from the price at submission time. If `finalEvePrice` has
     dropped more than your `priceTolerance` below `evePriceAtRequestTime`, the request is **closed for
-    slippage** — your EVE is returned to you and you receive no ETH. Otherwise, your ETH entitlement is
+    slippage**. Your EVE is returned to you and you receive no ETH. Otherwise, your ETH entitlement is
     computed and credited.
 
     Processing must occur within three days of batch pricing. Strictly after that deadline,
@@ -68,7 +68,7 @@ economical. Immediate exits have no minimum.
 
 ## Slippage tolerance
 
-When you queue an exit, you specify a `priceTolerance` — the maximum percentage drop in base price you
+When you queue an exit, you specify a `priceTolerance`: the maximum percentage drop in base price you
 are willing to accept between your submission and the batch settlement. If the price falls more than
 this, your EVE is returned and you can try again.
 
@@ -118,13 +118,13 @@ a batch to be **24 hours old before automatic pricing**, counted from batch crea
 A request joining an older batch does not start a fresh 24-hour clock. This is
 an executor scheduling parameter, separate from ExitQueue's three-day window after pricing.
 Keeper availability, gas limits, and liquidity affect actual timing. See
-[Keepers and automation](/contracts/keepers-and-automation).
+[Keepers and automation](/developers/contracts/keepers-and-automation).
 
 ## See also
 
-- [Exiting & redeeming](/using-everstrat/exiting-and-redeeming) — the user-facing summary
-- [Pricing & the bonding curve](/how-everstrat-works/pricing-and-bonding-curve) — how base price is
+- [Exiting & redeeming](/using-everstrat/exiting-and-redeeming): the user-facing summary
+- [Pricing & the bonding curve](/how-everstrat-works/pricing-and-bonding-curve): how base price is
   computed
-- [Architecture at a glance](/how-everstrat-works/architecture) — how the ExitQueue fits into the full
+- [Architecture at a glance](/how-everstrat-works/architecture): how the ExitQueue fits into the full
   contract map
-- [Key risks](/risk-and-trust/key-risks) — liquidity and queue timing risks
+- [Key risks](/risk-and-trust/key-risks): liquidity and queue timing risks

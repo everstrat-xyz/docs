@@ -80,9 +80,15 @@ Agents should:
 - prefer explicit constraints, edge cases, and operational details over marketing phrasing
 
 For deployment claims, pin a chain block and distinguish proposed, scheduled, Ready, and Done.
-Keep address, setting, and migration state in `content/docs/operations/current-deployments.mdx`;
-link explanatory pages to that dated snapshot. Check deployed versions as well as source main.
+Keep contract addresses in `content/docs/reference/contract-addresses.mdx` and dated settings,
+strategy registration, and migration state in `content/docs/operations/current-deployments.mdx`.
+Link explanatory pages to those references. Check deployed versions as well as source main.
 Document code capabilities separately from the funded/configured user path.
+
+For content moves or consolidation, follow the section ownership in
+`content/docs/contributing/how-docs-should-be-maintained.mdx`. Remove superseded pages from the
+source collection, update internal links, and preserve page, legacy, Markdown, and image URLs
+with direct redirects in `next.config.mjs`.
 
 Keep local audit reports, scratch evidence, endpoint inventories, and machine-specific paths
 outside publishable content and commits. Publish the corrected docs, not the local audit note.

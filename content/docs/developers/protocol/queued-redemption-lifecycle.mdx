@@ -36,7 +36,7 @@ requires a new request. Expired offsets lapse without a checkpoint reset.
 Processed requests cannot be cancelled and credited ETH remains claimable.
 
 The queue keeper's minimum batch age is counted from batch creation and is separate from this window.
-There is no guaranteed settlement deadline. See [Keepers](/contracts/keepers-and-automation).
+There is no guaranteed settlement deadline. See [Keepers](/developers/contracts/keepers-and-automation).
 
 ## Indexing rule
 
@@ -44,4 +44,4 @@ There is no guaranteed settlement deadline. See [Keepers](/contracts/keepers-and
 The indexer must preserve request-time fields from the creation event. Claims can combine
 several redemptions and do not carry a per-request association.
 
-See [Activity mapping](/data/activity-feed-mapping) for event semantics.
+See [Activity mapping](/developers/data/activity-feed-mapping) for event semantics.

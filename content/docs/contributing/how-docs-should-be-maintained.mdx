@@ -10,6 +10,42 @@ description: Contributor maintenance rules for documentation content, navigation
 - link related pages instead of duplicating truth where possible
 - prefer config files and source files over old prose when those disagree
 
+## Section ownership
+
+| Section | Owns |
+| --- | --- |
+| Introduction | Product basics and a brief vocabulary |
+| Get Started | Prerequisites and short first-use walkthroughs |
+| Using Everstrat | Detailed user actions, costs, transaction states, and common problems |
+| How Everstrat Works | NAV, pricing formulas, strategy mechanics, and queue rules |
+| Risk & Trust | Risks, trust boundaries, roles/permissions, and security review coverage |
+| Reference | FAQ, complete glossary, canonical contract addresses, troubleshooting, and official links |
+| Developers | Protocol, Contracts, App internals, and Data/integrations subsections |
+| Operations | Dated deployment state, deployment instructions, runtime configuration, and recovery procedures |
+| Contributing | Repository ownership, synchronization, docs maintenance, and release-note policy |
+| Legal | Risk Disclosure and Privacy Notice |
+
+Keep addresses in [Contract addresses](/reference/contract-addresses). Keep changing settings,
+strategy registrations, and governance states in the [dated snapshot](/operations/current-deployments).
+A snapshot describes a verified block; deployment instructions describe a procedure.
+Retain that distinction when linking them.
+
+Give repeated explanations one canonical page and link to it from shorter guides.
+User-facing steps should still show important risk and expiry warnings where an action is taken.
+See [Release notes policy](/contributing/changelog-or-release-notes-strategy) for change records.
+
+## Content moves and consolidation
+
+When moving or merging pages:
+
+1. Preserve useful details in the canonical destination and remove superseded source files.
+2. Update page metadata, navigation, cards, internal links, and diagram references.
+3. Add direct permanent redirects in `next.config.mjs` for old pages, `/docs/*`, `.mdx`,
+   Markdown exports, and social-image URLs. Point every alias at its final destination.
+4. Regenerate the content collection and diagrams. Run the content, navigation, and HTTP
+   Markdown checks, plus lint, types, and a production build as listed in the repository README.
+5. Check search, LLM exports, sitemap, breadcrumbs, and mobile navigation for canonical content.
+
 ## App-Specific Rule
 
 Keep the docs rooted in MDX under `content/docs` and avoid hardcoding page content in React unless a

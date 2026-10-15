@@ -13,9 +13,35 @@ test("the deployment snapshot distinguishes executed upgrade and scheduled migra
   assert.match(snapshot, /019: register v2[^\n]+\*\*Waiting\*\*/);
   assert.match(snapshot, /020: drain and remove v1[^\n]+\*\*Waiting\*\*/);
   assert.match(snapshot, /Readiness is not automatic execution/);
+  const migration = compact("risk-and-trust/trust-and-governance.mdx");
   assert.match(
-    compact("contracts/controller.mdx"),
+    migration,
+    /October 12 snapshot.*?Controller 1\.1\.0 was active/,
+  );
+  assert.match(migration, /019 and 020 were scheduled and had not executed/);
+  assert.match(
+    migration,
+    /\/operations\/current-deployments#pending-migration/,
+  );
+  assert.match(
+    compact("developers/contracts/controller.mdx"),
     /withdrawFromStrategy.*?ADMIN or KEEPER/,
+  );
+});
+
+test("the role snapshot retains both verified Converter role assignments", () => {
+  const snapshot = read("operations/current-deployments.mdx");
+  assert.match(
+    snapshot,
+    /\| `CONVERTER_CALLER_ROLE` \| Four registered v1 strategies \[listed above\]\(#registered-strategies\) \|/,
+  );
+  assert.match(
+    snapshot,
+    /\| `CONVERTER_CALLER_MANAGER_ROLE` \| \[Converter\]\(\/reference\/contract-addresses#core-contracts-and-keeper-executors\) \|/,
+  );
+  assert.match(
+    compact("operations/current-deployments.mdx"),
+    /getRoleMemberCount\(\).*?getRoleMember\(\).*?snapshot block: four caller holders and one manager holder/,
   );
 });
 
@@ -49,8 +75,8 @@ test("expiry closes processing, not already credited claims", () => {
   for (const path of [
     "reference/faq.mdx",
     "how-everstrat-works/redemption-queue.mdx",
-    "protocol/queued-redemption-lifecycle.mdx",
-    "contracts/exit-queue.mdx",
+    "developers/protocol/queued-redemption-lifecycle.mdx",
+    "developers/contracts/exit-queue.mdx",
   ]) {
     const text = compact(path);
     assert.match(
@@ -64,22 +90,35 @@ test("expiry closes processing, not already credited claims", () => {
       path,
     );
   }
-  const keepers = compact("contracts/keepers-and-automation.mdx");
+  const keepers = compact("developers/contracts/keepers-and-automation.mdx");
   assert.match(keepers, /measured from batch creation/);
   assert.match(keepers, /\/how-everstrat-works\/redemption-queue/);
 });
 
 test("authority, fee basis, and wallet access retain their important boundaries", () => {
+  const permissions = compact("risk-and-trust/roles-and-permissions.mdx");
+  assert.match(
+    permissions,
+    /Whitelist\.removeSigner.*?ADMIN or SECURITY.*?enabled/,
+  );
+  assert.match(
+    permissions,
+    /SECURITY cannot add signers or disable the Whitelist/,
+  );
+  assert.match(permissions, /StrategyManager\.removeSupportedERC20/);
   for (const path of [
-    "governance/roles-permissions-and-admin-powers.mdx",
     "risk-and-trust/trust-and-governance.mdx",
     "risk-and-trust/security-and-audits.mdx",
   ]) {
-    assert.match(read(path), /Whitelist.*?(?:removeSigner|signer)/i, path);
+    assert.match(
+      read(path),
+      /\/risk-and-trust\/roles-and-permissions#emergency-authority/,
+      path,
+    );
   }
-  assert.match(read("contracts/overview.mdx"), /per contract/);
+  assert.match(read("developers/contracts/overview.mdx"), /per contract/);
   assert.match(
-    read("contracts/interfaces-and-libraries.mdx"),
+    read("developers/contracts/interfaces-and-libraries.mdx"),
     /ADMIN or SECURITY.*paused strategy/,
   );
   assert.match(read("reference/glossary.mdx"), /accrued Uniswap V3 LP fees/);
@@ -87,8 +126,8 @@ test("authority, fee basis, and wallet access retain their important boundaries"
     read("reference/glossary.mdx"),
     /maxTokensToBurn[^\n]+queued escrow/,
   );
-  assert.match(read("app/mint-ui.mdx"), /enterWithInvite/);
-  assert.doesNotMatch(read("app/mint-ui.mdx"), /US person/);
+  assert.match(read("developers/app/mint-ui.mdx"), /enterWithInvite/);
+  assert.doesNotMatch(read("developers/app/mint-ui.mdx"), /US person/);
   assert.match(
     read("get-started/connect-wallet-and-supported-network.mdx"),
     /Accept invite/,

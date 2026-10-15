@@ -10,6 +10,9 @@ description: Evidence-based review coverage and the protections actually present
   internal reviews, or audit-fix PR titles.
 </Callout>
 
+{/* Preserve published section links from the consolidated audit page. */}
+<span id="current-documentation-state" className="block scroll-m-28" />
+
 ## Review coverage
 
 Public development history contains review-driven fixes and tests. Those are useful evidence
@@ -22,28 +25,18 @@ and remediation status. Coverage of v1 does not automatically cover a different 
 
 ## Immutable core and configurable dependencies
 
-EVE, AMM, Registry, and individual UniCL strategy instances have fixed deployed bytecode.
-Controller, StrategyManager, ExitQueue, Oracle, and Converter are upgradeable.
-The timelock held ADMIN and had a 48-hour delay at the
-[dated deployment snapshot](/operations/current-deployments).
-
-Fixed AMM code is not a guarantee that its inputs remain unchanged: Registry peers, NAV
-logic, oracle feeds, connector weight, and other settings can change through authorized paths.
+The code model is documented in
+[Immutable versus upgradeable](/risk-and-trust/trust-and-governance#immutable-versus-upgradeable).
+Fixed AMM bytecode still consumes configurable peers and upgradeable NAV and queue inputs.
 Performance-fee configuration and treasury EVE minting live in StrategyManager.
 
 ## Emergency authority
 
-ADMIN or SECURITY can pause designated modules and use designated emergency paths.
-SECURITY also has the specific ability to remove supported ERC-20s from StrategyManager
-accounting and revoke Whitelist signers while that gate is enabled. It cannot add Whitelist
-signers, disable that gate, unpause, or authorize upgrades.
-
-Pauses are per contract. Registry pause gates only its own guarded mutations; it does not
-pause every peer. A paused AMM blocks normal entry/exit, and other module pauses block
-their relevant operations. Strategy `emergencyExit()` permits ADMIN or SECURITY and requires
-the strategy to be paused.
-They do not block AMM's claim or eligible cancellation paths.
-The timelock is a review window. It does not guarantee that an exit will settle before a change.
+The canonical [Emergency authority](/risk-and-trust/roles-and-permissions#emergency-authority)
+section documents pause boundaries, strategy recovery, supported-token accounting removal,
+and Whitelist signer revocation. These controls and the timelock provide operational safeguards;
+they do not guarantee that an exit settles before a change. Claims and eligible cancellations
+remain available without fresh NAV.
 
 ## Fail-closed valuation
 
@@ -80,5 +73,14 @@ Mimic functions call allowlisted keeper executors. Execution values are re-deriv
 off-chain payloads do not supply authoritative NAV or settlement amounts.
 Availability still depends on tasks, funding, RPC, gas policies, feeds, and contract eligibility.
 
-See [Keepers and automation](/contracts/keepers-and-automation),
+<span id="known-limitations-visible-in-source" className="block scroll-m-28" />
+
+## App and data limitations
+
+The app assumes Ethereum mainnet. Historical account data depends on the Goldsky subgraph,
+which can lag chain state. Deployment and environment documentation must be maintained with
+configuration changes. See [Operational trust](/risk-and-trust/trust-and-governance#operational-trust)
+and [Failure and recovery scenarios](/operations/failure-and-recovery-scenarios).
+
+See [Keepers and automation](/developers/contracts/keepers-and-automation),
 [Key risks](/risk-and-trust/key-risks), and [Trust & governance](/risk-and-trust/trust-and-governance).

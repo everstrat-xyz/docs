@@ -13,8 +13,8 @@ description: What can fail in practice and which recovery path exists today in t
     Processed requests instead require a claim. The app checks eligibility from RPC state.
   </Accordion>
   <Accordion title="Queued redemption moves outside tolerance">
-    The request can close due to slippage instead of redeeming ETH. In that case the user receives
-    token refund semantics rather than settlement.
+    Processing outside the user's slippage tolerance returns EVE without crediting ETH.
+    Read the request outcome before assuming settlement occurred.
   </Accordion>
   <Accordion title="Subgraph is behind the chain">
     Historical activity may lag. Balances, claimable ETH, current-batch state, and indexed pending

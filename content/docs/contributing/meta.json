@@ -5,6 +5,7 @@
     "repository-map",
     "system-and-responsibilities",
     "cross-workspace-sync-rules",
-    "how-docs-should-be-maintained"
+    "how-docs-should-be-maintained",
+    "changelog-or-release-notes-strategy"
   ]
 }

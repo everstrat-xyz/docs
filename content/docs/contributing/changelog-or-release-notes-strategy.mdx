@@ -1,0 +1,27 @@
+---
+title: Release notes policy
+description: Contributor policy for recording deployment, app, data, and documentation changes.
+---
+
+## Recommended Strategy
+
+This page describes how to author release notes. It is not a release history.
+Keep release records near the surfaces that actually change:
+
+- contract deployment changes in `operations`
+- frontend behavior changes in `everstrat-xyz/app`, linked from Developers / App
+- data model or endpoint changes near their app/subgraph source, linked from Developers / Data
+
+## Minimum Useful Entry
+
+Each release note should record:
+
+- date
+- changed workspace
+- changed addresses, endpoints, or UX behavior
+- whether docs were updated in the same change set
+
+For deployment records, distinguish proposed, scheduled, Ready, and executed changes.
+Include the pinned block and execution receipt when reporting a live change. Update the
+[current deployment snapshot](/operations/current-deployments) and
+[canonical address reference](/reference/contract-addresses) as their evidence changes.

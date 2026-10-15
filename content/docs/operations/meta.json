@@ -5,7 +5,7 @@
     "deployment-architecture",
     "contract-deployment-sequence",
     "current-deployments",
-    "smart-contract-addresses",
+    "failure-and-recovery-scenarios",
     "subgraph-deployments",
     "environment-variables",
     "docs-app-runtime-configuration",
