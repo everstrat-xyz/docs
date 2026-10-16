@@ -112,12 +112,13 @@ Production sharing-client and artwork acceptance remained tracked separately in
 
 ## 2026-10-12
 
-### Governance can now withdraw from one strategy
+### Governance can now pull funds from one strategy into Controller
 
-Controller 1.1.0 is active on mainnet, giving the admin timelock a targeted withdrawal path for strategy migrations.
+Controller 1.1.0 is active on mainnet, letting the admin timelock move a specific strategy's funds back into Controller for strategy migrations.
 
+- Funds always return to Controller; governance cannot send them to any other address.
 - The Controller proxy address stays the same.
-- Keeper access remains available; SECURITY gains no new withdrawal permission.
+- Keeper access remains available; SECURITY gains no new permission.
 
 
 
@@ -127,8 +128,10 @@ Controller 1.1.0 is active on mainnet, giving the admin timelock a targeted with
 #### Controller 1.1.0 activated
 
 **Executed on mainnet.** Upgraded the Controller proxy to 1.1.0. The admin timelock can now call
-`withdrawFromStrategy` alongside the keeper, providing a governed path to drain a specific strategy
-for migration. SECURITY does not gain that permission. The proxy address remains unchanged.
+`withdrawFromStrategy` alongside the keeper, providing a governed path to move a specific strategy's
+funds back into Controller for migration. The function has no recipient parameter: StrategyManager
+always withdraws to the Controller, so governance cannot transfer strategy funds to any other address.
+SECURITY does not gain that permission. The proxy address remains unchanged.
 
 Evidence: [contracts #52](https://github.com/everstrat-xyz/contracts/pull/52),
 [governance 018 payload](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/018-controller-upgrade-v1.1.0), and
@@ -343,7 +346,7 @@ Sources: [ebcef8f](https://github.com/everstrat-xyz/app/commit/ebcef8f95b),
 
 ### Controller 1.1.0 is ready for upgrade
 
-The targeted admin-withdrawal implementation merged. Its mainnet proxy upgrade followed on October 12.
+The implementation letting ADMIN move a single strategy's funds into Controller merged. Its mainnet proxy upgrade followed on October 12.
 
 
 
@@ -354,7 +357,8 @@ The targeted admin-withdrawal implementation merged. Its mainnet proxy upgrade f
 
 #### Controller 1.1.0 implementation merged
 
-**Merged.** Added ADMIN authorization to the single-strategy withdrawal function and changed
+**Merged.** Added ADMIN authorization to the single-strategy withdrawal function, which returns funds
+to Controller only, and changed
 `version()` from 1.0.0 to 1.1.0. This source milestone preceded the
 [October 12 proxy upgrade](/changelog/contracts#2026-10-12); it did not itself activate the permission on mainnet.
 

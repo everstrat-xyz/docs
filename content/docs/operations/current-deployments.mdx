@@ -34,7 +34,7 @@ which integrations should call.
 | `StrategyManager.performanceFeeBps()` | `1500` | 15% of eligible accrued Uniswap V3 LP fees; it is not charged on deposits |
 | `StrategyManager.daoTreasury()` | `0x1780C78eB50cD28dC349CEA8452eD1F7206D8fF9` | Recipient of fee EVE |
 | `Timelock.getMinDelay()` | `172800 seconds` | 48-hour scheduling delay |
-| `Controller.version()` | `1.1.0` | 018 executed; ADMIN or KEEPER may withdraw from a single strategy |
+| `Controller.version()` | `1.1.0` | 018 executed; ADMIN or KEEPER may move a single strategy's funds into Controller |
 | Both keeper executors' `version()` | `2.1.0-mimic` | Mimic executor contracts |
 | `QueueKeeperExecutor.minBatchAge()` | `86400 seconds` | A batch can be priced automatically once it is 24 hours old |
 | `StrategyKeeperExecutor.controllerReserveETH()` | `0.05 ETH` | Controller reserve target |
@@ -96,9 +96,9 @@ Allowlisting alone does not prove uninterrupted off-chain task execution.
 
 | Governance record | Chain state at the snapshot | Effect |
 | --- | --- | --- |
-| [018: Controller 1.1.0](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/018-controller-upgrade-v1.1.0) | **Done**, executed | Added ADMIN access to the single-strategy withdrawal function |
+| [018: Controller 1.1.0](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/018-controller-upgrade-v1.1.0) | **Done**, executed | Added ADMIN access to the single-strategy withdrawal function (funds return to Controller only) |
 | [019: register v2 strategies](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/019-strategy-manager-register-unicl-v2-strategies) | **Waiting**, scheduled | Adds four v2 replacements; does not remove v1 |
-| [020: drain and remove v1](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/020-strategy-manager-drain-remove-unicl-v1-strategies) | All four operations **Waiting**, scheduled | Withdraws from and removes the old strategies |
+| [020: drain and remove v1](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/020-strategy-manager-drain-remove-unicl-v1-strategies) | All four operations **Waiting**, scheduled | Moves the old strategies' funds into Controller and removes them |
 
 Record 018 executed at block **26,176,319** (**October 12, 12:13:23 UTC**), in
 [this transaction](https://etherscan.io/tx/0xd3e005e636591e9c91c9c237be11d778baa1b31a18ca6b7af4ddb3750a9e2c33).
