@@ -1,0 +1,236 @@
+---
+title: Automation updates
+description: Changes to queue processing and strategy automation.
+---
+
+
+<ChangeEntry category="Automation" status="On-chain">
+
+## 2026-09-26
+
+### Smaller withdrawals and a settlement reserve
+
+The strategy keeper can withdraw as little as 0.0001 ETH, and targets a 0.05 ETH reserve in Controller for settlement.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Smaller withdrawal threshold and Controller reserve
+
+**Executed on mainnet.** Changed `minWithdrawETH` from **0.01** to **0.0001 ETH** and
+`controllerReserveETH` from **0** to **0.05 ETH**. These settings allow smaller strategy withdrawals
+and retain a Controller reserve for queue settlement.
+
+Evidence: [governance 016](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/016-strategy-keeper-exit-settlement-funding).
+The [threshold call](https://etherscan.io/tx/0x791f1de42df3186d7a5c2a2c08afca9be236b4a04cbd5113d6e01408ebbe5eef)
+executed at block **26,061,390**, **11:40:59 UTC**; the
+[reserve call](https://etherscan.io/tx/0x99e134c1a12ae5c6c76f1bb3b590701cb5827bbb413bbcec3a1356de257d5253)
+at block **26,061,396**, **11:42:11 UTC**.
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Automation" status="Code merged">
+
+## 2026-09-24
+
+### Gas budgets depend on the job
+
+W2’s new fee policy gives each action its own budget and increases urgency as priced exits approach expiry.
+
+- Withdrawals and rebalances use deadline-aware ceilings.
+- Deposits, harvests, and liquidity top-ups use amount-based budgets.
+- Operators must redeploy the function and recreate its trigger.
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Per-action W2 gas-fee policy
+
+**Merged.** Replaced one flat fee policy with action-specific ceilings. Withdrawal shortfalls use
+a deadline ramp, rebalances can inherit that urgency, sync uses a lower ceiling, and deposit,
+harvest, and exit-liquidity actions use an amount-based budget. The function continues to forward
+the on-chain checker's payload bytes. Invalid fee inputs produce configuration-error logs.
+
+Source: [keepers #30](https://github.com/everstrat-xyz/keepers/pull/30).
+**Operator action:** deploy the new function and recreate the trigger with its updated inputs.
+The merge date does not establish when that trigger became active.
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Automation" status="Code merged">
+
+## 2026-09-19
+
+### Skip rebalance batches that can only revert
+
+W2 skips a rebalance when every selected strategy is non-calm, avoiding guaranteed no-op work.
+
+- Read failures are logged separately and emit no intent.
+- Other actions keep the on-chain checker’s exact payload.
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Suppress guaranteed no-op rebalance batches
+
+**Merged.** W2 suppresses a Rebalance intent when every selected strategy is non-calm and the
+batch would therefore only revert. Read failures emit no intent and are logged separately.
+Other actions retain the checker's exact payload, and ambiguous payloads retain the prior relay
+behavior. This is an off-chain mitigation for static strategies with the older health predicate.
+
+Source: [keepers #28](https://github.com/everstrat-xyz/keepers/pull/28).
+**Operator action:** redeploy the function and recreate its trigger against the new CID.
+The subsequent [strategy health-predicate fix](/changelog/strategies#2026-09-22) is a separate
+implementation change.
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Automation" status="On-chain">
+
+## 2026-09-17
+
+### Mimic is authorized to call both executors
+
+The Mimic smart account is added to the queue and strategy executor allowlists.
+
+- This authorizes executor calls without granting the account a Registry keeper role.
+- Authorization alone does not establish continuous off-chain task execution.
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Mimic caller authorized on both executors
+
+**Executed on mainnet.** Added the Mimic smart account to the QueueKeeperExecutor and
+StrategyKeeperExecutor caller allowlists. The smart account can call executor `perform()`;
+it does not itself acquire Registry's KEEPER role. This authorization does not prove ongoing
+task availability or a particular function CID.
+
+Evidence: [governance 012](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/012-keeper-executors-allow-mimic-caller).
+The [queue executor call](https://etherscan.io/tx/0x0441b1f863b9e70a25c52c9eecc50c25fcfd970520bcd41b2000fa25cd788049)
+executed at block **25,997,085**, **12:02:59 UTC**; the
+[strategy executor call](https://etherscan.io/tx/0x08760b797858c72e59a5b52c3b60ffdf85896f6614a9205be777c76775e0df3f)
+at block **25,997,092**, **12:04:23 UTC**.
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Automation" status="Code merged">
+
+## 2026-08-26
+
+### Queue and strategy keepers move to Mimic
+
+W1 and W2 are rebuilt as Mimic functions. W1 handles queue decisions; W2 relays the contract checker’s instructions.
+
+- Timestamp conversion, missing-map reads, and payload guards are fixed.
+- The old W4 watcher and Go plane are removed from the final merge.
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Mimic W1/W2 functions
+
+**Merged.** Replaced the earlier CRE/Gelato implementations with Mimic functions compiled from
+AssemblyScript to WASM. W1 retains queue decisions and cross-checks; W2 relays the contract
+checker's payload. Fixed millisecond/second conversion, missing-map access, AMM pause checks,
+and payload-length enforcement. Removed the old W4 freeze-watch and Go plane from the final merge.
+
+Sources: [keepers #24](https://github.com/everstrat-xyz/keepers/pull/24),
+[W4 removal 24534c3](https://github.com/everstrat-xyz/keepers/commit/24534c3852), and
+[W1 guards 7c58f2f](https://github.com/everstrat-xyz/keepers/commit/7c58f2f378).
+The final merged tree supersedes the PR description's earlier statement that W4 remained.
+On-chain executor metadata changed in [contracts #46](https://github.com/everstrat-xyz/contracts/pull/46);
+caller authorization followed [on September 17](#2026-09-17).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Automation" status="Code merged">
+
+## 2026-08-25
+
+### Queue scans spend their read budget on useful work
+
+Historical CRE keepers skip unusable queue candidates, avoid pricing after a truncated scan, and split large user-list reads into chunks.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### CRE-era queue selection and read-budget fixes
+
+**Merged.** W1 skips expired candidates and continues to later processable batches instead of
+spending the read budget on an unusable head. A truncated request scan blocks new pricing.
+W2 excludes unpriced/expired batches from its needs scan and chunks large user-list reads.
+These entries describe the historical CRE implementation before the Mimic migration.
+
+Sources: [keepers #21](https://github.com/everstrat-xyz/keepers/pull/21) and
+[#22](https://github.com/everstrat-xyz/keepers/pull/22).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Automation" status="Code merged">
+
+## 2026-08-20
+
+### The first keeper implementation reaches main
+
+W1 queue decisions, W2 strategy decisions, and the historical W4 watcher are merged from staging. This CRE-era implementation is later replaced by Mimic.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Initial keeper implementation merged to main
+
+**Merged.** Brought the staging keeper implementation into main, including W1 queue decisions,
+W2 strategy decisions, shared report encoding, and the historical read-only W4 watcher.
+It included alignment with priced-liability and deposit-weight semantics from the contracts.
+This CRE-era implementation was superseded on August 26.
+
+Source: [keepers #18](https://github.com/everstrat-xyz/keepers/pull/18), with implementation commits
+[1e919d2](https://github.com/everstrat-xyz/keepers/commit/1e919d22ca),
+[3dd571e](https://github.com/everstrat-xyz/keepers/commit/3dd571e99d), and
+[e98cf81](https://github.com/everstrat-xyz/keepers/commit/e98cf819b1).
+
+</details>
+
+</ChangeEntry>
+
+<details className="change-details">
+<summary>About this history</summary>
+
+Dates are UTC. **Merged** entries describe source changes; a new WASM build or changed trigger input
+requires deployment and trigger configuration before it affects live automation. **Executed on
+mainnet** confirms an on-chain configuration change, not uninterrupted off-chain task execution.
+
+</details>

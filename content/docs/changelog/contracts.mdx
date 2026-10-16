@@ -1,0 +1,466 @@
+---
+title: Contract updates
+description: Protocol upgrades, permissions, and configuration changes.
+---
+
+
+<ChangeEntry category="Contracts" status="On-chain">
+
+## 2026-10-12
+
+### Governance can now withdraw from one strategy
+
+Controller 1.1.0 is active on mainnet, giving the admin timelock a targeted withdrawal path for strategy migrations.
+
+- The Controller proxy address stays the same.
+- Keeper access remains available; SECURITY gains no new withdrawal permission.
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Controller 1.1.0 activated
+
+**Executed on mainnet.** Upgraded the Controller proxy to 1.1.0. The admin timelock can now call
+`withdrawFromStrategy` alongside the keeper, providing a governed path to drain a specific strategy
+for migration. SECURITY does not gain that permission. The proxy address remains unchanged.
+
+Evidence: [contracts #52](https://github.com/everstrat-xyz/contracts/pull/52),
+[governance 018 payload](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/018-controller-upgrade-v1.1.0), and
+[execution receipt](https://etherscan.io/tx/0xd3e005e636591e9c91c9c237be11d778baa1b31a18ca6b7af4ddb3750a9e2c33),
+block **26,176,319**, **12:13:23 UTC**. The receipt contains the implementation upgrade and
+timelock execution events. The proposal's older Scheduled wording predates this execution.
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Contracts" status="Code merged">
+
+## 2026-09-29
+
+### Controller 1.1.0 is ready for upgrade
+
+The targeted admin-withdrawal implementation merged. Its mainnet proxy upgrade followed on October 12.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Controller 1.1.0 implementation merged
+
+**Merged.** Added ADMIN authorization to the single-strategy withdrawal function and changed
+`version()` from 1.0.0 to 1.1.0. This source milestone preceded the
+[October 12 proxy upgrade](#2026-10-12); it did not itself activate the permission on mainnet.
+
+Source: [contracts #52](https://github.com/everstrat-xyz/contracts/pull/52).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Contracts" status="On-chain">
+
+## 2026-09-26
+
+### The 15% performance fee is enabled
+
+The protocol now charges 15% of eligible accrued Uniswap V3 LP trading fees.
+
+- The fee is settled by minting EVE to the DAO treasury.
+- Deposits and general NAV growth are not the fee basis.
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Performance fee enabled
+
+**Executed on mainnet.** Changed `StrategyManager.performanceFeeBps` from **0** to **1500** (15%).
+The fee applies to eligible accrued Uniswap V3 LP fees and is settled by minting EVE to the DAO
+treasury. It is not a fee on deposits or all NAV growth.
+
+Evidence: [governance 014](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/014-strategy-manager-performance-fee-bps),
+[execution receipt](https://etherscan.io/tx/0xcac94cc8af126797663f909c10e10e40a42513b17d2d0c0fc1a3ecd03c74673a),
+block **26,061,384**, **11:39:47 UTC**. See [Performance fee](/how-everstrat-works/strategies-and-yield#performance-fee).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Contracts" status="On-chain">
+
+## 2026-09-22
+
+### UNI valuation and accounting support
+
+The UNI/USD price feed and supported-token registration are active, preparing the protocol for the UNI/WETH strategy.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### UNI oracle and supported-token registration
+
+**Executed on mainnet.** Added the UNI/USD feed with a **4200-second** staleness bound and added
+UNI to StrategyManager's supported ERC-20 set. These calls prepared token valuation and accounting;
+the UNI/WETH strategy was [registered on September 26](/changelog/strategies#2026-09-26).
+
+Evidence: [governance 013](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/013-add-uni-supported-token).
+The [feed call](https://etherscan.io/tx/0x2c158399c99f1820b2bebe4101f0fdde529a6a3cc9e27a8ae239be66d7304f72)
+executed at block **26,036,243**, **23:15:47 UTC**, and the
+[supported-token call](https://etherscan.io/tx/0x25d9e669ffdb784be09560ce0b6e94e5ab14d6f24f415c3206bcea193736c39a)
+at block **26,036,248**, **23:16:47 UTC**.
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Contracts" status="On-chain">
+
+## 2026-09-16
+
+### More margin around the USDT feed heartbeat
+
+The USDT price-feed freshness window increases from 24 hours to 24 hours 30 minutes.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### USDT feed staleness margin
+
+**Executed on mainnet.** Increased the USDT/USD staleness interval from **86400** to **88200 seconds**
+to allow heartbeat jitter while preserving a finite freshness bound.
+
+Evidence: [governance 010](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/010-oracle-usdt-staleness-margin),
+[execution receipt](https://etherscan.io/tx/0xfa6d1d560c00bc60ee0d3a479b8b25bd821e9173bc91293f2ceaaff0e6023e3a),
+block **25,989,820**, **11:44:47 UTC**.
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Contracts" status="On-chain">
+
+## 2026-09-15
+
+### ETH and USDC feed freshness windows adjusted
+
+Oracle freshness bounds gain a margin for normal feed-update timing: 70 minutes for ETH/WETH and 23 hours 30 minutes for USDC.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### ETH and USDC feed staleness margins
+
+**Executed on mainnet.** Increased the WETH and native-ETH feed staleness bounds from **3600**
+to **4200 seconds**, and USDC from **82800** to **84600 seconds**.
+
+Evidence: [governance 008](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/008-oracle-staleness-margin).
+Execution receipts: [WETH](https://etherscan.io/tx/0x703329c72ce8665acd9f04bb4334a0100e731b3a68317f8f6688e95374274319)
+at block **25,983,142**, **13:24:11 UTC**;
+[native ETH](https://etherscan.io/tx/0xb143651f07c6c947f7623d2e192af273399e26561c027f43785277f6c3a7e442)
+at block **25,983,200**, **13:35:59 UTC**; and
+[USDC](https://etherscan.io/tx/0x39e48a2a99d45b57c9e27e4460d075c95ad059e8760128e9060688be7e908c51)
+at block **25,983,206**, **13:37:11 UTC**.
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Contracts" status="On-chain">
+
+## 2026-09-13
+
+### USDT valuation and accounting are enabled
+
+USDT gets a USD price feed and joins the protocol’s supported-token set.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### USDT valuation and accounting support
+
+**Executed on mainnet.** Registered the USDT/USD feed with an initial **86400-second** staleness
+bound, then added USDT to StrategyManager's supported-token set.
+
+Evidence: [governance 006](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/006-oracle-usdt-feed)
+and [007](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/007-strategy-manager-supported-usdt).
+The [feed registration](https://etherscan.io/tx/0x1d641ca6005443ce9ac21d7f61f6116a8b9fe0aa2e8f1975108404b401d0b934)
+executed at block **25,968,966**, **13:59:11 UTC**; the
+[supported-token registration](https://etherscan.io/tx/0x4114df3d438f70bcae9d57916f04193d8ca72648227427c0b0d1a87e3e0b79fc)
+at block **25,970,736**, **19:53:47 UTC**.
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Contracts" status="On-chain">
+
+## 2026-09-08
+
+### USDC accounting and Uniswap conversion are enabled
+
+USDC joins the supported-token set, and the Uniswap V3 Converter adapter is authorized.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### USDC accounting and Uniswap adapter enabled
+
+**Executed on mainnet.** Added USDC to StrategyManager's supported ERC-20 set and allowed the
+Uniswap V3 Converter adapter. Adapter authorization is separate from registering a strategy.
+
+Evidence: [governance 004](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/004-strategy-manager-supported-usdc)
+and [005](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/005-converter-allow-univ3-adapter).
+The [USDC call](https://etherscan.io/tx/0x1a97bcc41c357bcabde9975a4f7d79a396d090ff76d3cb1717e9c4828d8ed431)
+executed at block **25,933,686**, **15:57:47 UTC**; the
+[adapter call](https://etherscan.io/tx/0x4c98976ee87a01aea563f73eabc2759385394c286fad3d19c9fa3c23ecc51a8c)
+at block **25,934,444**, **18:30:11 UTC**.
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Contracts" status="On-chain">
+
+## 2026-09-07
+
+### USD price feeds for USDC and WETH
+
+The first USDC/USD and WETH/USD feeds are registered on mainnet.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### USDC and WETH USD feeds registered
+
+**Executed on mainnet.** Configured the USDC/USD and WETH/USD reference feeds with initial
+staleness bounds of **82800** and **3600 seconds**. Later bounds are recorded above.
+
+Evidence: [governance 003](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/003-oracle-usd-feeds),
+[execution receipt](https://etherscan.io/tx/0xe324753e7cc9d004c5348fa91ecbd80017fce4d955f7f84a6bfa7e3dfd06942c),
+block **25,925,347**, **12:02:11 UTC**.
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Contracts" status="On-chain">
+
+## 2026-09-03
+
+### The Everstrat EVE token is registered
+
+The Registry points to the new token named Everstrat, with the symbol EVE. The unused bootstrap token is replaced.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Everstrat EVE token registered
+
+**Executed on mainnet.** Repointed Registry's EVE key to the re-deployed token named Everstrat,
+symbol EVE. The original bootstrap token had no supply. Canonical token and proxy addresses are
+maintained in [Contract addresses](/reference/contract-addresses).
+
+Evidence: [governance 002](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/002-eve-token-everstrat),
+[execution receipt](https://etherscan.io/tx/0xc4c550f57bb5425fea1c9a144f30c223b29ad63a1d0b1a3082deb920a1944f90),
+block **25,897,546**, **15:01:59 UTC**.
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Contracts" status="Code merged">
+
+## 2026-08-26
+
+### Executor metadata follows the Mimic migration
+
+Keeper executors adopt Mimic naming and version 2.1.0-mimic. The existing caller-allowlist mechanism is retained.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Mimic-compatible executor metadata
+
+**Merged.** Keeper executor metadata and documentation became vendor-neutral, and the version
+changed to **2.1.0-mimic**. This did not introduce a new structural execution mechanism: the caller
+allowlist already supported per-operator automation addresses. Off-chain migration and on-chain
+caller authorization have separate dates in [Automation](/changelog/automation).
+
+Source: [contracts #46](https://github.com/everstrat-xyz/contracts/pull/46).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Contracts" status="Code merged">
+
+## 2026-08-18
+
+### Keeper receipts report what actually moved
+
+Controller methods return achieved amounts so keeper receipts reflect execution results.
+
+- Unpriced, cancellable exits no longer drive strategy-withdrawal liabilities.
+- Empty whole-batch processing becomes a no-op.
+- Deposit eligibility checks the strategy’s deposit weight.
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Keeper liabilities and achieved amounts
+
+**Merged.** Excluded unpriced, cancellable exits from strategy-keeper withdrawal liabilities.
+Controller deposit, withdrawal, and harvest methods return achieved amounts, which the strategy
+executor uses in receipts instead of requested estimates. Empty whole-batch processing becomes a
+no-op, and deposit eligibility also checks nonzero deposit weight.
+
+Source: [contracts #43](https://github.com/everstrat-xyz/contracts/pull/43).
+The returned amounts change the Controller ABI; clients should use the matching interfaces.
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Contracts" status="Code merged">
+
+## 2026-08-17
+
+### Share pricing accounts for priced exits
+
+Live pricing and fee minting now account for in-window priced redemption liabilities and escrowed EVE.
+
+- Minting happens before ETH is forwarded to Controller.
+- Deployment checks enforce the timelock floor, proposer, and whitelist setup.
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Priced-queue share accounting and deployment checks
+
+**Merged.** Live pricing and fee minting deduct in-window priced redemption liabilities and their
+escrowed EVE. Unpriced requests remain equity; expired unprocessed requests stop contributing to
+those offsets and recover through cancellation/closure. Added a 25-live-priced-batch bound.
+The ExitQueue storage-layout change requires migration planning for an initialized proxy.
+
+Also reordered minting before the ETH transfer to Controller, and hardened deployment checks for
+the 48-hour timelock floor, a nonzero proposer, and Whitelist registration before finalization.
+
+Sources: [contracts #39](https://github.com/everstrat-xyz/contracts/pull/39),
+[#16](https://github.com/everstrat-xyz/contracts/pull/16), and
+[#41](https://github.com/everstrat-xyz/contracts/pull/41).
+Strategy circuit-breaker changes are recorded in [Strategy updates](/changelog/strategies#2026-08-17).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Contracts" status="Code merged">
+
+## 2026-08-14
+
+### Emergency Converter pause and new keeper receivers
+
+SECURITY can pause Converter immediately; unpausing remains an admin action. Historical CRE receivers replace the earlier automation contracts.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Converter emergency pause and CRE executor implementation
+
+**Merged.** SECURITY gained permission to pause Converter; unpause remained ADMIN-only.
+Replaced the legacy Chainlink Automation executors with CRE/Keystone receivers, including
+forwarder/workflow authentication and replay guards. This historical CRE integration was
+subsequently superseded by the Mimic-compatible executor plane.
+
+Sources: [contracts #17](https://github.com/everstrat-xyz/contracts/pull/17) and
+[#5](https://github.com/everstrat-xyz/contracts/pull/5).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Contracts" status="Code merged">
+
+## 2026-08-08
+
+### Strategy activation goes through the timelock
+
+Deploying a strategy and activating it are now separate steps. Adapter authorization and strategy registration use the admin timelock.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Timelocked strategy go-live
+
+**Merged.** Unified deployment flows so adapter allowlisting and strategy registration go through
+the admin timelock. Core deployment, adapter deployment, strategy deployment, and authorization
+are distinct steps. Deployment configuration became explicit for performance fees and keeper roles.
+
+Source: [contracts #1](https://github.com/everstrat-xyz/contracts/pull/1).
+
+</details>
+
+</ChangeEntry>
+
+<details className="change-details">
+<summary>About this history</summary>
+
+Dates are UTC. **Merged** entries use source merge dates and do not establish deployment.
+**Executed on mainnet** entries were checked against successful transaction receipts and block
+timestamps. Strategy implementation and registration history lives in
+[Strategy updates](/changelog/strategies); off-chain keeper changes live in
+[Automation](/changelog/automation). Addresses remain in the
+[canonical reference](/reference/contract-addresses).
+
+</details>

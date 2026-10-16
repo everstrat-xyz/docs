@@ -11,6 +11,9 @@ This read-only snapshot is pinned to Ethereum mainnet block **26,179,157**
 It does not refresh automatically.
 The app uses chain ID **1**.
 
+A [limited migration recheck on October 15](#migration-recheck-october-15-2026) is recorded below.
+The other settings, balances, and role tables retain the October 12 verification boundary.
+
 Entry remains invite-gated: `Whitelist.disabled()` returned `false`.
 A deployed address or a merged PR is not an announcement of unrestricted access.
 
@@ -129,6 +132,29 @@ authorization already enabled by 018, and use 019 as their timelock predecessor.
 The basket can temporarily contain both generations. Do not describe migration as complete
 until execution receipts and the strategy list confirm it. Refresh this snapshot after
 019/020 execute, including strategy and Converter caller registration.
+
+## Migration recheck: October 15, 2026
+
+A read-only recheck of **Controller version, timelock states, and the registered strategy list**
+was pinned to Ethereum mainnet block **26,199,960**, **October 15, 2026, 19:18:11 UTC**, hash
+`0x47bf3b2566e613ed44e5109dfcef849681ff828f06643dfae3a5f7440bbd0a08`.
+This recheck does not refresh the October 12 balances, settings, role holders, or strategy funding.
+
+| Read | Result at block 26,199,960 |
+| --- | --- |
+| `Controller.version()` | `1.1.0` |
+| 018 operation `0x8cc3710fc1e770419105d3974350f2de05eb8a575e8057bf602fd28830b7c98a` | `3` — **Done** |
+| 019 operation `0xf558cda6b3831a4fb393278e368ff3b319c04696e37ebb034d31c463fc9ed6a6` | `2` — **Ready** |
+| 020 USDC/WETH 0.30% operation `0xfa9e716cf5547d760c68e8758a4900a0644df7490af3fbee8a9ccf56ed7493d5` | `2` — **Ready** |
+| 020 USDC/WETH 0.01% operation `0xe9438cb7438f47c22b1e74477c013d86870cb08f7080080844d3532dacef75c8` | `2` — **Ready** |
+| 020 WETH/USDT 0.30% operation `0xe680e96963678090ac5854516999bf7c770284e622e66c014e04c689b9265bd9` | `2` — **Ready** |
+| 020 UNI/WETH 0.30% operation `0x93ee86d5f12f2b739647a886d51e7dce3baeb77c02809d4c0d10fcf3b81f4cd2` | `2` — **Ready** |
+| `StrategyManager.strategies()` | The same four v1 addresses listed under [Registered strategies](#registered-strategies) |
+
+019 and 020 had not executed at this block. The passing of their ready-at times did not activate
+the migration. The [strategy changelog](/changelog/strategies#pending-migration) links this check
+to the implementation and proposal history; [contract updates](/changelog/contracts#2026-10-12)
+record the separately executed Controller upgrade.
 
 ## Data and source references
 

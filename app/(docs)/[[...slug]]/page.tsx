@@ -10,6 +10,7 @@ import {
 import { createRelativeLink } from "fumadocs-ui/mdx";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { ChangelogNav } from "@/components/changelog";
 import { getMDXComponents } from "@/components/mdx";
 import { getGitHubContentUrl, siteConfig } from "@/lib/config";
 import { createDocsPageMetadata } from "@/lib/metadata";
@@ -43,6 +44,7 @@ export default async function Page(props: DocsPageProps) {
   const contentPath = getPageContentPath(page);
   const description = page.data.description ?? siteConfig.description;
   const lastModified = getPageLastModified(page);
+  const isChangelog = page.slugs[0] === "changelog";
 
   return (
     <>
@@ -61,16 +63,27 @@ export default async function Page(props: DocsPageProps) {
       )}
       <DocsPage
         toc={page.data.toc}
-        full={page.data.full ?? page.url === "/"}
+        full={page.data.full ?? (page.url === "/" || isChangelog)}
+        tableOfContent={{ enabled: !isChangelog }}
+        tableOfContentPopover={{ enabled: !isChangelog }}
         footer={{ enabled: page.url !== "/", className: "docs-page-footer" }}
-        className={page.url === "/" ? "docs-home" : undefined}
+        className={
+          isChangelog
+            ? "docs-changelog"
+            : page.url === "/"
+              ? "docs-home"
+              : undefined
+        }
       >
         <header className="docs-page-header">
           <DocsTitle>{page.data.title}</DocsTitle>
           <DocsDescription className="mb-0">
             {page.data.description}
           </DocsDescription>
-          <div className="docs-page-actions flex flex-wrap gap-2 items-center">
+          <div
+            className="docs-page-actions flex flex-wrap gap-2 items-center"
+            hidden={isChangelog}
+          >
             <MarkdownCopyButton markdownUrl={markdownUrl} />
             <ViewOptionsPopover
               markdownUrl={markdownUrl}
@@ -78,6 +91,7 @@ export default async function Page(props: DocsPageProps) {
             />
           </div>
         </header>
+        {isChangelog ? <ChangelogNav active={page.slugs[1]} /> : null}
         <DocsBody>
           <MDX
             components={getMDXComponents({
