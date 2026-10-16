@@ -64,7 +64,7 @@ fees and attributable harvested EVE; see [Metrics](/using-everstrat/tracking-you
 
 ### Share a snapshot that stays the same
 
-Shared protocol snapshots now keep the figures from the block you selected.
+Shared protocol snapshots now keep the figures from the finalized block captured when you copied the link.
 
 - Snapshot links get a matching social preview.
 - Ordinary app links use the Everstrat brand image.
@@ -1321,9 +1321,9 @@ Sources: [ad31792](https://github.com/everstrat-xyz/app/commit/ad31792ce5),
 
 ## 2026-08-26
 
-### Executor metadata follows the Mimic migration
+### Keeper executors are rebuilt around a caller allowlist
 
-Keeper executors adopt Mimic naming and version 2.1.0-mimic. The existing caller-allowlist mechanism is retained.
+Vendor-neutral keeper executors replace the CRE receivers. Any allowlisted automation address, such as a Mimic smart account, can call them.
 
 
 
@@ -1332,11 +1332,15 @@ Keeper executors adopt Mimic naming and version 2.1.0-mimic. The existing caller
 <details className="change-details">
 <summary>Details & sources</summary>
 
-#### Mimic-compatible executor metadata
+#### CRE receivers replaced by caller-allowlist executors
 
-**Merged.** Keeper executor metadata and documentation became vendor-neutral, and the version
-changed to **2.1.0-mimic**. This did not introduce a new structural execution mechanism: the caller
-allowlist already supported per-operator automation addresses. Off-chain migration and on-chain
+**Merged.** Removed the CRE/Keystone receivers merged on [August 14](/changelog/contracts#2026-08-14)
+(`CREReceiverBase`, `CREQueueExecutor`, `CREStrategyExecutor`) and replaced them with
+`KeeperExecutorBase`, `QueueKeeperExecutor`, and `StrategyKeeperExecutor`. Instead of forwarder and
+workflow-identity checks, the new executors admit calls from an ADMIN-managed caller allowlist
+(`allowExecutorCaller`), so any per-operator automation address can drive them. Executor version is
+**2.1.0-mimic**. The PR passed through an intermediate Gelato-based version before the final
+Mimic-oriented naming; only the final state reached `main`. Off-chain migration and on-chain
 caller authorization have separate dates in [Automation](/changelog/automation).
 
 Source: [contracts #46](https://github.com/everstrat-xyz/contracts/pull/46).
@@ -1374,7 +1378,7 @@ Sources: [keepers #24](https://github.com/everstrat-xyz/keepers/pull/24),
 [W4 removal 24534c3](https://github.com/everstrat-xyz/keepers/commit/24534c3852), and
 [W1 guards 7c58f2f](https://github.com/everstrat-xyz/keepers/commit/7c58f2f378).
 The final merged tree supersedes the PR description's earlier statement that W4 remained.
-On-chain executor metadata changed in [contracts #46](https://github.com/everstrat-xyz/contracts/pull/46);
+The on-chain executors were replaced in [contracts #46](https://github.com/everstrat-xyz/contracts/pull/46);
 caller authorization followed [on September 17](/changelog/automation#2026-09-17).
 
 </details>
