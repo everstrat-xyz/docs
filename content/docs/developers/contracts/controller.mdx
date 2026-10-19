@@ -24,7 +24,7 @@ after governance operation 018 executed. `withdrawFromStrategy(address,uint256)`
 ADMIN or KEEPER. Other routine strategy deposit/withdrawal and queue functions retain their
 own permission checks; the upgrade does not grant ADMIN every keeper function.
 
-The v2 migration's v1 drain operations rely on this added ADMIN permission.
+The v2 migration's v1 drain operations (020) relied on this added ADMIN permission.
 They are governance transactions; users do not call them to withdraw.
 
 ## Integration boundaries

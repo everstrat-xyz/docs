@@ -1,13 +1,13 @@
 ---
 title: Current deployments
-description: Ethereum mainnet settings, exit liquidity, role holders, and governance state at block 26,179,157.
+description: Ethereum mainnet settings, exit liquidity, role holders, and governance state at block 26,226,476.
 ---
 
 ## Verification boundary
 
-This read-only snapshot is pinned to Ethereum mainnet block **26,179,157**
-(**October 12, 2026, 21:42:47 UTC**), hash
-`0x3d555940233dd8faf3cc6d8225a3563c32a9bd696182d30c6875ed8e5ad2ed19`.
+This read-only snapshot is pinned to Ethereum mainnet block **26,226,476**
+(**October 19, 2026, 11:59:35 UTC**), hash
+`0x8c8b9f242d4b1513b6bd8d6b8502db03ce3581a590508239980d63c28b138029`.
 It does not refresh automatically.
 The app uses chain ID **1**.
 
@@ -47,11 +47,11 @@ keeper's minimum batch age. Expiry and cancellation rules are in
 
 | Read | Result (wei) |
 | --- | --- |
-| AMM ETH balance | `3050180077552095` |
-| `AMM.lockedForClaims()` | `3050180077552095` |
+| AMM ETH balance | `0` |
+| `AMM.lockedForClaims()` | `0` |
 | `AMM.freeBalance()` | `0` |
 
-All ETH held by AMM was reserved for existing claims. Every new successful positive-size
+AMM held no ETH and had no free balance. Every new successful positive-size
 exit at this block would therefore queue, subject to the queued minimum and other checks.
 Deposits are forwarded to Controller, and `exitLiquidityTargetETH = 0` disables routine
 AMM float top-up. The contracts still settle an exit immediately when free balance covers it,
@@ -60,15 +60,16 @@ immediate exit is available. This snapshot does not establish historical exit co
 
 ## Registered strategies
 
-`StrategyManager.strategies()` returned these four v1 strategy addresses.
+`StrategyManager.strategies()` returned these four v2 strategy addresses, registered by 019.
+The v1 strategies were drained and removed by 020; see [Strategy migration](#strategy-migration).
 Registration does not guarantee that a strategy is healthy, funded, or executing at every moment.
 
 | Pool | Fee tier | Registered strategy |
 | --- | --- | --- |
-| USDC/WETH | 0.30% | `0x5E12FFD5e0F69d37B581D06b68ad6c53609cac38` |
-| USDC/WETH | 0.01% | `0x59C476c1817b23791d96F35b9f468E6d9A242252` |
-| WETH/USDT | 0.30% | `0x3Fb6B9174427CA4FF38728398F4F4CB526F66501` |
-| UNI/WETH | 0.30% | `0x956fE55DB50527E75c1fcA679adE509AD89cAFDd` |
+| USDC/WETH | 0.30% | `0xfbcC73fA67F50D38FB318991C6CAbD5A6f64014A` |
+| USDC/WETH | 0.01% | `0x63B68CC99991429CA8a808125e446990Ae7fe669` |
+| WETH/USDT | 0.30% | `0xE80bfd65A55855ead8Cb5f7040031426CB718Cc5` |
+| UNI/WETH | 0.30% | `0xFC888a499c4172e393A258FbC6cAd1475a7e4129` |
 
 ## Role holders
 
@@ -78,7 +79,7 @@ Registration does not guarantee that a strategy is healthy, funded, or executing
 | `SECURITY_ROLE` | `0x7c128C1CF39822B4133F8E067F4bF14999c49846` |
 | `KEEPER_ROLE` | QueueKeeperExecutor and StrategyKeeperExecutor |
 | `MINTER_ROLE` | AMM and StrategyManager |
-| `CONVERTER_CALLER_ROLE` | Four registered v1 strategies [listed above](#registered-strategies) |
+| `CONVERTER_CALLER_ROLE` | Four registered v2 strategies [listed above](#registered-strategies) |
 | `CONVERTER_CALLER_MANAGER_ROLE` | [Converter](/reference/contract-addresses#core-contracts-and-keeper-executors) |
 | `DEFAULT_ADMIN_ROLE` | No holders |
 
@@ -89,46 +90,42 @@ Both executors allow the Mimic caller `0x41153f0c36f8Fb5c38396573dDB487AC95a9825
 This is an executor caller allowlist. The account itself holds no `KEEPER_ROLE`.
 Allowlisting alone does not prove uninterrupted off-chain task execution.
 
-## Pending migration
+## Strategy migration
 
 | Governance record | Chain state at the snapshot | Effect |
 | --- | --- | --- |
 | [018: Controller 1.1.0](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/018-controller-upgrade-v1.1.0) | **Done**, executed | Added ADMIN access to the single-strategy withdrawal function |
-| [019: register v2 strategies](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/019-strategy-manager-register-unicl-v2-strategies) | **Waiting**, scheduled | Adds four v2 replacements; does not remove v1 |
-| [020: drain and remove v1](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/020-strategy-manager-drain-remove-unicl-v1-strategies) | All four operations **Waiting**, scheduled | Withdraws from and removes the old strategies |
+| [019: register v2 strategies](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/019-strategy-manager-register-unicl-v2-strategies) | **Done**, executed | Registered the four v2 strategies |
+| [020: drain and remove v1](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/020-strategy-manager-drain-remove-unicl-v1-strategies) | All four operations **Done**, executed | Withdrew from and removed the four v1 strategies |
 
 Record 018 executed at block **26,176,319** (**October 12, 12:13:23 UTC**), in
 [this transaction](https://etherscan.io/tx/0xd3e005e636591e9c91c9c237be11d778baa1b31a18ca6b7af4ddb3750a9e2c33).
-The Controller proxy's implementation slot now points to
+The Controller proxy's implementation slot points to
 `0xd4f4152a887253CFdD23d0289951176Ec13cd55D`.
 
-019's operation `0xf558cda6b3831a4fb393278e368ff3b319c04696e37ebb034d31c463fc9ed6a6`
-becomes Ready at **October 14, 2026, 15:58:23 UTC**. All four 020 operations become
-Ready at **October 14, 2026, 16:09:47 UTC**:
+019 and 020 executed on **October 19, 2026**, between blocks **26,226,427** and **26,226,432**.
+020's operations name 019 as their timelock predecessor, so 019 executed first.
 
-- `0xfa9e716cf5547d760c68e8758a4900a0644df7490af3fbee8a9ccf56ed7493d5`
-- `0xe9438cb7438f47c22b1e74477c013d86870cb08f7080080844d3532dacef75c8`
-- `0xe680e96963678090ac5854516999bf7c770284e622e66c014e04c689b9265bd9`
-- `0x93ee86d5f12f2b739647a886d51e7dce3baeb77c02809d4c0d10fcf3b81f4cd2`
+| Operation | Record | Block | Execution transaction |
+| --- | --- | --- | --- |
+| `0xf558cda6b3831a4fb393278e368ff3b319c04696e37ebb034d31c463fc9ed6a6` | 019 | 26,226,427 | [`0xffad87e1…5fa9`](https://etherscan.io/tx/0xffad87e17fae7d4f9f74b7d7cef3ecbeb346f50dd12454968b2e603bdf125fa9) |
+| `0xfa9e716cf5547d760c68e8758a4900a0644df7490af3fbee8a9ccf56ed7493d5` | 020 | 26,226,428 | [`0x4eaa06d6…680f`](https://etherscan.io/tx/0x4eaa06d6ee6c1efaaa7872ed57b289f9e5c1b3f84f6c6e690816ac229860680f) |
+| `0xe9438cb7438f47c22b1e74477c013d86870cb08f7080080844d3532dacef75c8` | 020 | 26,226,429 | [`0x469b60d0…d56c`](https://etherscan.io/tx/0x469b60d0c72afe0277cf70ea37667dbf60ff582381ced4f90defa705dc09d56c) |
+| `0xe680e96963678090ac5854516999bf7c770284e622e66c014e04c689b9265bd9` | 020 | 26,226,430 | [`0x13b895e8…6959`](https://etherscan.io/tx/0x13b895e816a3489ec678398f7ed367b0b2921a55296359797e0f06c0b7be6959) |
+| `0x93ee86d5f12f2b739647a886d51e7dce3baeb77c02809d4c0d10fcf3b81f4cd2` | 020 | 26,226,432 | [`0x0bb24561…b44f`](https://etherscan.io/tx/0x0bb24561cec0a6ad46d9d022a67999481851193dbcd80895c2caaf275c1eb44f) |
 
-Readiness is not automatic execution. Operations can also be cancelled.
 The linked proposal files describe intended payloads; their older status prose is not
 the authority for this pinned chain state.
 
-The v2 strategy addresses recorded in governance were deployed but **not registered** at this block:
+At the snapshot block the retired v1 strategies were absent from `StrategyManager.strategies()`,
+held no `CONVERTER_CALLER_ROLE`, and reported `navInETH() = 0`:
 
-| Pool | Proposed v2 address |
+| Pool | Retired v1 address |
 | --- | --- |
-| USDC/WETH 0.30% | `0xfbcC73fA67F50D38FB318991C6CAbD5A6f64014A` |
-| USDC/WETH 0.01% | `0x63B68CC99991429CA8a808125e446990Ae7fe669` |
-| WETH/USDT 0.30% | `0xE80bfd65A55855ead8Cb5f7040031426CB718Cc5` |
-| UNI/WETH 0.30% | `0xFC888a499c4172e393A258FbC6cAd1475a7e4129` |
-
-019 has no timelock predecessor. The drain transactions in 020 require the ADMIN withdrawal
-authorization already enabled by 018, and use 019 as their timelock predecessor.
-The basket can temporarily contain both generations. Do not describe migration as complete
-until execution receipts and the strategy list confirm it. Refresh this snapshot after
-019/020 execute, including strategy and Converter caller registration.
+| USDC/WETH 0.30% | `0x5E12FFD5e0F69d37B581D06b68ad6c53609cac38` |
+| USDC/WETH 0.01% | `0x59C476c1817b23791d96F35b9f468E6d9A242252` |
+| WETH/USDT 0.30% | `0x3Fb6B9174427CA4FF38728398F4F4CB526F66501` |
+| UNI/WETH 0.30% | `0x956fE55DB50527E75c1fcA679adE509AD89cAFDd` |
 
 ## Data and source references
 

@@ -81,11 +81,11 @@ The app assumes Ethereum mainnet and handles unsupported networks explicitly.
 See [Data access](/developers/data/subgraph-and-data-access) and
 [Failure and recovery scenarios](/operations/failure-and-recovery-scenarios).
 
-## Current migration
+## Strategy migration
 
-At the October 12 snapshot, **Controller 1.1.0 was active** after 018 executed;
-**019 and 020 were scheduled and had not executed**. The strategy migration was still pending.
-See [Pending migration](/operations/current-deployments#pending-migration) for the block,
-ready times, and execution evidence. Becoming Ready on October 14 does not execute an operation.
+At the October 19 snapshot, **Controller 1.1.0 was active** after 018 executed, and
+**019 and 020 had executed**: the four v2 strategies were registered and the v1 strategies
+drained and removed. See [Strategy migration](/operations/current-deployments#strategy-migration)
+for the blocks and execution transactions.
 
 For review coverage, see [Security & audits](/risk-and-trust/security-and-audits).
