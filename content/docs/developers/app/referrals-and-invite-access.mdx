@@ -1,0 +1,120 @@
+---
+title: Referral registration and access
+description: Personal invite codes, wallet-signature registration, durable attribution, private referral reads, and the boundary with on-chain access.
+---
+
+Referrals are an application registration feature backed by PostgreSQL. The app records
+who invited a wallet independently of the wallet's browser session and on-chain mint history.
+For user instructions and the
+[registration diagram](/using-everstrat/referrals#everstrat-referrals-diagram), see
+[Referrals](/using-everstrat/referrals).
+
+Reward accounting, reward balances, commission rates, and payouts are not implemented.
+
+## Codes and ownership
+
+Every registered wallet has one permanent five-character personal code. New codes use
+uppercase letters and digits, omitting `0`, `1`, `I`, and `O`. Input is trimmed and uppercased.
+Codes are generated in PostgreSQL from cryptographic UUID bytes and reserved atomically.
+
+Personal and administrative codes share a reservation namespace, so a code cannot identify
+both kinds of invitation. Reservations survive deletion and prevent later reassignment.
+Personal code allocation retries collisions, and a database trigger rejects changes to an
+allocated five-character code. These public codes are not authentication credentials.
+
+Both kinds use `/invite` and `/invite/<CODE>`, with server-side dispatch by code kind.
+A personal code is reusable across new wallets. An administrative invite can be claimed by
+one wallet.
+
+## Registration sequence
+
+1. **Issue a challenge.** `POST /api/invites/challenge` accepts `{ code, address }`.
+   It checks request origin, applies IP/wallet rate limits, normalizes the code, and resolves
+   its kind for the configured chain and Whitelist deployment. Personal registration requires
+   a different, unregistered wallet.
+2. **Sign for the referral purpose.** The server issues a five-minute Sign-In with Ethereum
+   (SIWE) challenge stating `Join Everstrat through a referral.` Its resource is
+   `urn:everstrat:referral:<codeHash>`. The signature binds the wallet, chain, origin,
+   invitation hash, nonce, expiry, and purpose. Invite redemption and access restoration use
+   separate purposes, so their signatures cannot be substituted.
+3. **Verify and register atomically.** `POST /api/invites/verify` accepts
+   `{ code, message, signature }` and determines the kind again on the server. After signature
+   verification, a transaction locks registration for the wallet/deployment, consumes the
+   matching unexpired nonce, inserts the member with its referrer and personal code, and
+   creates a claimed `invite_kind = 'referral'` access record. Failure does not leave a partial
+   registration.
+4. **Establish access.** The access record has an independent random on-chain `inviteId` and
+   a hashed private session token. The response sets the access cookie and returns
+   `{ ok: true, redirectTo: "/portfolio" }`. Administrative redemption returns `/mint`.
+
+The nonce is single-use and stored as a hash, bound to the parent and registering wallet.
+Both initial administrative claims and personal registration take the same transaction-scoped
+advisory lock. The first successful registration fixes attribution; later claims or sign-ins
+do not allocate another member or change its parent.
+
+See the pinned
+[registration repository](https://github.com/everstrat-xyz/app/blob/8b4331de75d4c44065a99cb8babaa6b3f4602b51/src/lib/referrals/repository.ts)
+and [SIWE implementation](https://github.com/everstrat-xyz/app/blob/8b4331de75d4c44065a99cb8babaa6b3f4602b51/src/lib/invites/siwe.ts).
+
+## Durable data and invariants
+
+| Record | Responsibility |
+| --- | --- |
+| `referral_members` | Wallet, chain, Whitelist deployment, permanent code, optional `referrer_id`, and registration time |
+| `referral_nonces` | Hashed single-use challenge, referrer, wallet, and expiry |
+| `invite_code_reservations` | Shared unique code hashes for administrative and personal invitations |
+| `invite_codes` | Individual access claim, random `inviteId`, status, and session-token hash; referral claims have no email |
+
+`(wallet, chain_id, whitelist_address)` is unique. A composite foreign key requires the parent
+to belong to the same deployment, and `referrer_id < id` requires an earlier member. Together
+these constraints prevent self-referrals and cycles. There is no API for reparenting a member.
+
+Initial administrative claims create members without a parent. Revoking or deleting an access
+invite does not remove the member, code, or attribution. Retained attribution does not itself
+grant a valid access session.
+
+## Private referral API
+
+`GET /api/referrals?wallet=<address>&cursor=<id>` requires an app access session.
+The requested wallet must match the session wallet. The server uses its configured chain and
+Whitelist address; the caller cannot select another deployment through query parameters.
+
+| Response field | Meaning |
+| --- | --- |
+| `wallet` | Checksummed owner address |
+| `referralCode` | Owner's five-character personal code |
+| `totalCount` | Total direct referrals, independent of the current page |
+| `referrals` | Up to ten entries containing string `id`, checksummed `wallet`, and UTC ISO `registeredAt` |
+| `nextCursor` | Last returned ID when more entries exist; otherwise `null` |
+
+The first request omits `cursor`. Pass `nextCursor` back unchanged to get the next page.
+IDs are strings; do not convert them to JavaScript numbers. Pagination uses `id < cursor`,
+ordered by descending ID, and accepts positive PostgreSQL bigint cursors. The owner, count,
+and page are read in one database statement. Only immediate children are returned, with no
+recursive downline, email, or financial data.
+
+| Status | Meaning |
+| --- | --- |
+| `401` | Missing or invalid access session |
+| `403` | Missing, invalid, or mismatched wallet parameter |
+| `400` | Invalid cursor |
+| `503` | Session is valid but no member exists for this deployment |
+| `500` | Referral data could not be loaded |
+
+Responses use `Cache-Control: private, no-store`. The client scopes queries by wallet and cursor,
+remounts on wallet changes, aborts pending sign-ins on unmount, and hides previous data after
+authorization or fetch failures. Refresh resets pagination to the first page. Errors must not
+be rendered as zero referrals.
+
+## Browser session and on-chain access
+
+The access cookie is `HttpOnly`, `SameSite=Strict`, and `Secure` in production, with a 14-day
+lifetime. Its session must also be valid in the database. Registered wallets restore access via
+`/api/invites/access/challenge` and `/api/invites/access/verify`, using the access SIWE purpose.
+
+Referral registration does not transact with Whitelist or AMM. The public personal code is
+never used as an on-chain invite identifier. A first mint uses the
+`POST /api/whitelist/voucher` route and the individual access record's `inviteId`; the signer
+must be configured and authorized on-chain. Registration alone therefore does not establish
+that minting is available. See [Mint UI](/developers/app/mint-ui) and
+[AMM entry points](/developers/contracts/amm).

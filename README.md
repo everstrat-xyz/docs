@@ -209,7 +209,7 @@ Use `<DocsDiagram name="architecture" />` in MDX. The component is registered in
 definitions live in `lib/diagrams.ts`; the shared Everstrat light/dark skin lives
 in `components/docs-diagram.css`. No diagram runtime or client bundle is required.
 
-Available names: `architecture`, `mint`, `exit`, `queue`, `nav`, `strategies`, `data`.
+Available names: `architecture`, `mint`, `exit`, `queue`, `nav`, `strategies`, `data`, `referrals`.
 Embed each diagram on one canonical page. Other pages should link directly to its
 `#everstrat-{name}-diagram` anchor. Keep the surrounding prose complete so search
 and Markdown/LLM exports remain useful without the figure.
@@ -223,6 +223,7 @@ and Markdown/LLM exports remain useful without the figure.
 | `nav` | `/how-everstrat-works/eve-and-nav` |
 | `strategies` | `/how-everstrat-works/strategies-and-yield` |
 | `data` | `/developers/data/subgraph-and-data-access` |
+| `referrals` | `/using-everstrat/referrals` |
 
 `bun run diagrams:gen` regenerates the self-contained HTML previews in
 `public/diagrams/` from the same definitions, renderer, and stylesheet. Run it after

@@ -340,6 +340,7 @@ test("sitemap and LLM exports contain canonical pages without superseded copies 
     "mint",
     "nav",
     "queue",
+    "referrals",
     "strategies",
   ]) {
     const response = await fetch(`${baseUrl}/diagrams/${name}.html`);

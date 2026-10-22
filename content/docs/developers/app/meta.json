@@ -3,6 +3,7 @@
   "icon": "AppWindow",
   "pages": [
     "overview",
+    "referrals-and-invite-access",
     "wallet-connection-and-supported-chain",
     "mint-ui",
     "burn-ui",
