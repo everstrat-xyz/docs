@@ -200,6 +200,10 @@ Notes:
 - `bun run test:markdown` requires a production build, starts a temporary local server, and checks
   Markdown suffix/Accept requests, legacy `/docs/*` paths, HTML responses, and discovery endpoints
 
+`package.json` overrides Lightning CSS to 1.33.0 so Tailwind can optimize Fumadocs search
+`::highlight(fd-search)` styles without parser warnings. Keep this override until Tailwind's
+own dependency includes that support.
+
 ## Writing Documentation
 
 ### Diagrams
