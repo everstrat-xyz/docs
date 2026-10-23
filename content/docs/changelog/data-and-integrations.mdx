@@ -1,0 +1,249 @@
+---
+title: Data & integration updates
+description: Indexing, analytics, and integration improvements.
+---
+
+
+<ChangeEntry category="Data" status="Code merged">
+
+## 2026-10-10
+
+### Position history follows your actual EVE holdings
+
+Portfolio reconstructs positions from indexed mints, burns, transfers, and redemption-price snapshots.
+
+- Queued exits stay in the position until processing changes the holding.
+- Valuation uses lifetime prices, and usable history survives refresh failures.
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Connected-wallet position reconstruction
+
+**Merged.** Reconstructs EVE holdings from indexed mints, burns, transfers, and redemption-price
+snapshots. Queued and slippage-closed exits remain part of the position until processing changes
+the holding. Position history uses lifetime prices for valuation and preserves usable history
+through refresh failures. The user-facing rollout is recorded in
+[App updates](/changelog/app#2026-10-10).
+
+Source: [app #2](https://github.com/everstrat-xyz/app/pull/2), including
+[e3d29f7](https://github.com/everstrat-xyz/app/commit/e3d29f7cbf).
+Synthetic checks and deployment success do not establish the outstanding real-wallet acceptance
+tracked in [app #12](https://github.com/everstrat-xyz/app/issues/12).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Data" status="Source update">
+
+## 2026-09-30
+
+### Missing data stays missing
+
+Insights stops treating incomplete collection as complete results.
+
+- Funnels preserve missing values and respect the selected period.
+- Revised reports replace earlier versions atomically.
+- Partial Telegram collection is shown separately.
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Insights completeness and attribution corrections
+
+**Committed.** Incomplete protocol index coverage is rejected instead of treated as complete.
+Conversion funnels preserve missing data and respect the selected period; weekly metrics retain
+unknown values. Revised analytics reports replace prior versions atomically, and partial Telegram
+collection is distinguished from complete collection.
+
+Sources: [ebcef8f](https://github.com/everstrat-xyz/app/commit/ebcef8f95b),
+[e10f1a0](https://github.com/everstrat-xyz/app/commit/e10f1a0882),
+[599ab54](https://github.com/everstrat-xyz/app/commit/599ab54331), and
+[85030fc](https://github.com/everstrat-xyz/app/commit/85030fced1).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Data" status="Source update">
+
+## 2026-09-04
+
+### Each timelock batch call has its own history
+
+Indexed governance records now distinguish individual calls by operation ID and call index.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Timelock calls indexed individually
+
+**Committed.** Timelock call records are identified by operation ID and call index, preserving
+individual calls within a batch rather than treating the operation as a single call.
+
+Source: [82f9179](https://github.com/everstrat-xyz/app/commit/82f91796b2ca7931c6531a87378ab8af6d80c81d).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Data" status="Source update">
+
+## 2026-09-03
+
+### Mainnet data, access, and governance indexing
+
+The app and subgraph share mainnet deployment configuration. The indexer adds Whitelist records and scheduled, executed, and cancelled governance operations.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Mainnet source configuration and access/governance indexing
+
+**Committed.** Added Ethereum mainnet deployment configuration shared by the app and subgraph.
+Extended indexing to Whitelist and Timelock state, including access records and scheduled,
+executed, and cancelled governance operations. Indexed history supports the UI; pinned chain
+reads remain the authority for current permissions and operation readiness.
+
+Sources: [98688bc](https://github.com/everstrat-xyz/app/commit/98688bc6764443a640825ec0ddde17248fc7e3a4)
+and [737cff7](https://github.com/everstrat-xyz/app/commit/737cff76125aaf20aa6aeddcfce3c2b72b34cf5e).
+The [app network change](/changelog/app#2026-09-03) and subgraph deployment are separate milestones.
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Data" status="Source update">
+
+## 2026-07-30
+
+### Historical analytics and EVE transfer tracking
+
+Subgraph 0.2.0 adds dashboard aggregates and EVE transfer tracking. A snapshot worker provides persisted protocol history.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Dashboard aggregates and protocol snapshots
+
+**Committed.** Subgraph source version **0.2.0** added dashboard aggregates and EVE transfer
+tracking. Added a protocol analytics worker and persisted snapshots for performance history,
+followed by freshness metadata, caching, and validation. A source version does not establish a
+historical production-tag activation date.
+
+Sources: [da916e0](https://github.com/everstrat-xyz/app/commit/da916e04d9b9b863b0950a047fc391349e14a6d2),
+[b98606a](https://github.com/everstrat-xyz/app/commit/b98606abeafd83304368c586ef5432fb86392947), and
+[8c37fcf](https://github.com/everstrat-xyz/app/commit/8c37fcfd18).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Data" status="Source update">
+
+## 2026-07-08
+
+### The indexer moves to Ethereum Sepolia
+
+Testnet configuration and frontend ABIs move from Arbitrum Sepolia to Ethereum Sepolia. Mainnet follows in September.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Ethereum Sepolia configuration
+
+**Committed.** Moved the subgraph configuration from Arbitrum Sepolia to Ethereum Sepolia and
+aligned frontend network configuration and protocol ABIs. This was a testnet milestone; mainnet
+configuration followed in September.
+
+Sources: [f470c4e](https://github.com/everstrat-xyz/app/commit/f470c4e048d72c1546608148b2c396aa5f856725),
+[0e41347](https://github.com/everstrat-xyz/app/commit/0e41347cbf), and
+[ae15707](https://github.com/everstrat-xyz/app/commit/ae15707194).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Data" status="Source update">
+
+## 2026-03-18
+
+### More complete account activity
+
+The indexer gains expanded event handling and user-activity tracking for account history.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Account activity indexing expanded
+
+**Committed.** Expanded subgraph event handling and user-activity tracking after the initial
+indexer scaffold, providing the historical data used by account activity views.
+
+Source: [50345b3](https://github.com/everstrat-xyz/app/commit/50345b3ad96177b2445f53506e27c53721837fc3).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Data" status="Source update">
+
+## 2026-03-17
+
+### The first protocol subgraph
+
+The initial Arbitrum Sepolia indexer tracks AMM, EVE, and ExitQueue events.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Initial protocol subgraph
+
+**Committed.** Added the initial protocol subgraph for Arbitrum Sepolia with AMM, EVE, and ExitQueue
+event handlers, schema, configuration, and query documentation. Later network and schema entries
+supersede this historical configuration.
+
+Source: [8f9fd46](https://github.com/everstrat-xyz/app/commit/8f9fd460f1049e70aa2092984d88182b3b82abcd).
+
+</details>
+
+</ChangeEntry>
+
+<details className="change-details">
+<summary>About this history</summary>
+
+Dates are UTC. This page records source milestones, with **Merged** or **Committed** status.
+A schema version or merge does not establish which subgraph artifact a production tag served
+on that date. See [Subgraph deployments](/operations/subgraph-deployments) for the maintained
+endpoint reference. Source links require access to the private `everstrat-xyz/app` repository.
+
+</details>

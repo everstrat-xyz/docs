@@ -78,7 +78,9 @@ Introduction precedes Get Started in the shared desktop/mobile page tree. Produc
 in Introduction, short first-use guides in Get Started, detailed app guidance in Using Everstrat,
 and formulas and queue mechanics in How Everstrat Works. Developers contains Protocol, Contracts,
 App, and Data subsections. Risk & Trust owns risks, governance permissions, and security coverage;
-Operations owns deployment snapshots and recovery procedures. Contributor policies live in Contributing.
+Operations owns deployment snapshots and recovery procedures. Changelog owns dated app, contract,
+strategy, automation, and data changes; its overview links the category histories. Contributor
+policies, including changelog evidence and maintenance rules, live in Contributing.
 
 Consolidated product and contributor pages are removed from `content/docs`, not merely hidden
 from navigation. `next.config.mjs` preserves their old page, `/docs/*`, Markdown export, and
@@ -195,7 +197,8 @@ Notes:
 - `bun run lint` checks Biome without modifying files
 - `bun run lint:fix` applies safe Biome fixes
 - `bun run check` combines lint and Next route/TypeScript checks
-- `bun run docs:gen` refreshes generated Fumadocs source files under `.source`
+- `bun run changelog:gen` combines all dated category entries into the All updates feed; edit the category MDX files rather than `changelog/index.mdx`
+- `bun run docs:gen` refreshes the changelog feed and generated Fumadocs source files under `.source`
 - `bun run types:check` regenerates Next route types before running TypeScript
 - `bun run test:markdown` requires a production build, starts a temporary local server, and checks
   Markdown suffix/Accept requests, legacy `/docs/*` paths, HTML responses, and discovery endpoints
