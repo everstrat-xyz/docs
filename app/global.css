@@ -22,7 +22,11 @@
   --color-fd-accent-foreground: #171916;
   --color-fd-ring: #577c48;
   --color-fd-overlay: rgb(23 25 22 / 25%);
-  --color-fd-info: #6d8ba3;
+}
+
+/* Fumadocs resolves these tokens dynamically through --callout-color. */
+@theme static {
+  --color-fd-info: #496c86;
   --color-fd-warning: #ab732c;
   --color-fd-error: #bd4b45;
   --color-fd-success: #577c48;

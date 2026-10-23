@@ -64,7 +64,8 @@ before(async () => {
   server.stderr.on("data", (chunk) => {
     logs += chunk;
   });
-  const deadline = Date.now() + 10_000;
+  // A cold Fumadocs startup can outlast Next's initial "Ready" message.
+  const deadline = Date.now() + 60_000;
   while (Date.now() < deadline && server.exitCode === null) {
     try {
       const response = await fetch(baseUrl, {
@@ -130,7 +131,7 @@ test("legacy HTML requests retain their canonical redirect", async () => {
     headers: { Accept: "text/html" },
     redirect: "manual",
   });
-  assert.equal(response.status, 307);
+  assert.equal(response.status, 308);
   assert.equal(
     new URL(response.headers.get("location"), baseUrl).pathname,
     page,
@@ -179,7 +180,247 @@ test("all canonical pages and Markdown exports respond with their expected type"
       path,
     );
     assert.ok((await markdown.text()).startsWith("# "), path);
+    const canonical = new URL(
+      markdown.headers.get("link").match(/^<([^>]+)>; rel="canonical"$/)[1],
+    );
+    assert.equal(canonical.pathname, path, path);
+    assert.equal(canonical.search, "", path);
+    assert.equal(canonical.hash, "", path);
   });
+});
+
+test("Markdown negotiation redirects without caching a second representation of the HTML URL", async () => {
+  for (const accept of [
+    "text/markdown",
+    "text/html",
+    "text/plain",
+    "text/html",
+  ]) {
+    const response = await fetch(`${baseUrl}${page}`, {
+      headers: { Accept: accept },
+      redirect: "manual",
+    });
+    assert.doesNotMatch(response.headers.get("x-robots-tag") ?? "", /noindex/);
+    if (accept === "text/html") {
+      assert.equal(response.status, 200);
+      assert.match(response.headers.get("content-type"), /^text\/html\b/);
+    } else {
+      assert.equal(response.status, 307);
+      assert.equal(response.headers.get("vary"), "Accept");
+      assert.equal(response.headers.get("cache-control"), "private, no-store");
+      assert.equal(
+        new URL(response.headers.get("location"), baseUrl).pathname,
+        `/llms.mdx/docs${page}/content.md`,
+      );
+    }
+    await response.arrayBuffer();
+  }
+});
+
+test("export and image routes reject arbitrary filenames instead of creating duplicates", async () => {
+  for (const path of [
+    "/llms.mdx/docs",
+    "/llms.mdx/docs/not-content.md",
+    `/llms.mdx/docs${page}/not-content.md`,
+    "/og/docs/not-image.webp",
+    `/og/docs${page}/not-image.webp`,
+  ]) {
+    const response = await fetch(`${baseUrl}${path}`);
+    assert.equal(response.status, 404, path);
+    await response.arrayBuffer();
+  }
+});
+
+test("aggregate LLM exports are crawlable but excluded from search results", async () => {
+  const robots = await (await fetch(`${baseUrl}/robots.txt`)).text();
+  assert.doesNotMatch(robots, /Disallow: \/llms/);
+  for (const path of ["/llms.txt", "/llms-full.txt"]) {
+    const response = await fetch(`${baseUrl}${path}`);
+    assert.equal(response.status, 200, path);
+    assert.equal(response.headers.get("x-robots-tag"), "noindex, follow", path);
+    await response.arrayBuffer();
+  }
+});
+
+function decodeEntities(value) {
+  const entities = { amp: "&", quot: '"', lt: "<", gt: ">", "#x27": "'" };
+  return value.replace(
+    /&(amp|quot|lt|gt|#x27);/g,
+    (_, entity) => entities[entity],
+  );
+}
+
+function readHead(html) {
+  const head = html.slice(0, html.indexOf("</head>"));
+  const tags = [...head.matchAll(/<(meta|link)\s+([^>]+)>/g)].map(
+    ([, tag, attributes]) => ({
+      tag,
+      attributes: Object.fromEntries(
+        [...attributes.matchAll(/([\w:-]+)="([^"]*)"/g)].map(
+          ([, key, value]) => [key, decodeEntities(value)],
+        ),
+      ),
+    }),
+  );
+  return {
+    title: decodeEntities(head.match(/<title>(.*?)<\/title>/)[1]),
+    canonical: tags
+      .filter(
+        ({ tag, attributes }) =>
+          tag === "link" && attributes.rel === "canonical",
+      )
+      .map(({ attributes }) => attributes.href),
+    meta: Object.fromEntries(
+      tags
+        .filter(({ tag }) => tag === "meta")
+        .map(({ attributes }) => [
+          attributes.name ?? attributes.property,
+          attributes.content,
+        ]),
+    ),
+  };
+}
+
+function imageDimensions(bytes) {
+  if (
+    bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))
+  ) {
+    return [bytes.readUInt32BE(16), bytes.readUInt32BE(20)];
+  }
+  assert.equal(bytes.toString("ascii", 0, 4), "RIFF");
+  assert.equal(bytes.toString("ascii", 8, 12), "WEBP");
+  for (let offset = 12; offset + 8 < bytes.length; ) {
+    const type = bytes.toString("ascii", offset, offset + 4);
+    const start = offset + 8;
+    if (type === "VP8 ") {
+      return [
+        bytes.readUInt16LE(start + 6) & 0x3fff,
+        bytes.readUInt16LE(start + 8) & 0x3fff,
+      ];
+    }
+    if (type === "VP8L") {
+      const bits = bytes.readUInt32LE(start + 1);
+      return [(bits & 0x3fff) + 1, ((bits >>> 14) & 0x3fff) + 1];
+    }
+    if (type === "VP8X") {
+      return [
+        bytes.readUIntLE(start + 4, 3) + 1,
+        bytes.readUIntLE(start + 7, 3) + 1,
+      ];
+    }
+    const size = bytes.readUInt32LE(offset + 4);
+    offset += 8 + size + (size % 2);
+  }
+  assert.fail("No WebP image dimensions found");
+}
+
+test("the UI font is preloaded and served as the bundled same-origin WOFF2", async () => {
+  const html = await (await fetch(baseUrl)).text();
+  assert.doesNotMatch(html, /fonts\.(googleapis|gstatic)\.com/);
+  const fonts = [
+    ...html.matchAll(/<link\b[^>]*rel="preload"[^>]*as="font"[^>]*>/g),
+  ];
+  assert.equal(fonts.length, 1);
+  const href = fonts[0][0].match(/href="([^"]+)"/)[1];
+  assert.ok(href.startsWith("/_next/static/"));
+  const response = await fetch(new URL(href, baseUrl));
+  assert.equal(response.status, 200);
+  const bytes = Buffer.from(await response.arrayBuffer());
+  assert.equal(bytes.toString("ascii", 0, 4), "wOF2");
+  assert.deepEqual(
+    bytes,
+    readFileSync(join(root, "app/fonts/inter-latin-variable.woff2")),
+  );
+});
+
+test("every page has consistent SEO metadata, structured data, and a working social image", async () => {
+  const titles = new Set();
+  const descriptions = new Set();
+  const canonicals = new Set();
+  const sitemap = await (await fetch(`${baseUrl}/sitemap.xml`)).text();
+  const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(
+    ([, url]) => url,
+  );
+  assert.equal(sitemapUrls.length, routes.length);
+  const sitemapPaths = sitemapUrls.map((url) => new URL(url).pathname);
+  assert.deepEqual(sitemapPaths.sort(), [...routes].sort());
+
+  await each(routes, async (path) => {
+    // Inspect the original HTML delivered to a social crawler, without JavaScript.
+    const response = await fetch(`${baseUrl}${path}?utm_source=seo-check`, {
+      headers: { Accept: "text/html", "User-Agent": "Twitterbot/1.0" },
+    });
+    assert.equal(response.status, 200, path);
+    const html = await response.text();
+    const { title, canonical, meta } = readHead(html);
+    assert.ok(title && meta.description, path);
+    assert.ok(!titles.has(title), `Duplicate title: ${path}`);
+    assert.ok(
+      !descriptions.has(meta.description),
+      `Duplicate description: ${path}`,
+    );
+    titles.add(title);
+    descriptions.add(meta.description);
+    assert.equal((html.match(/<h1\b/g) ?? []).length, 1, path);
+    assert.deepEqual(canonical.length, 1, path);
+    assert.ok(!canonicals.has(canonical[0]), `Duplicate canonical: ${path}`);
+    canonicals.add(canonical[0]);
+    const url = new URL(canonical[0]);
+    assert.equal(url.pathname, path, path);
+    assert.equal(url.search, "", path);
+    assert.equal(new URL(meta["og:url"]).href, url.href, path);
+    assert.equal(meta["og:description"], meta.description, path);
+    assert.equal(meta["twitter:description"], meta.description, path);
+    assert.equal(meta["og:type"], path === "/" ? "website" : "article", path);
+    assert.equal(meta["twitter:card"], "summary_large_image", path);
+    assert.match(meta.robots, /\bindex\b/);
+    assert.doesNotMatch(meta.robots, /noindex/);
+    assert.equal(meta["og:image"], meta["twitter:image"], path);
+    assert.ok(meta["og:image:alt"] && meta["twitter:image:alt"], path);
+    const imageUrl = new URL(meta["og:image"]);
+    assert.equal(imageUrl.origin, url.origin, path);
+    const image = await fetch(
+      `${baseUrl}${imageUrl.pathname}${imageUrl.search}`,
+      {
+        headers: { "User-Agent": "Twitterbot/1.0" },
+      },
+    );
+    assert.equal(image.status, 200, imageUrl.pathname);
+    assert.equal(
+      image.headers.get("content-type"),
+      meta["og:image:type"],
+      path,
+    );
+    const bytes = Buffer.from(await image.arrayBuffer());
+    assert.ok(bytes.length > 0 && bytes.length < 5_000_000, path);
+    assert.deepEqual(imageDimensions(bytes), [1200, 630], path);
+    assert.equal(meta["og:image:width"], "1200", path);
+    assert.equal(meta["og:image:height"], "630", path);
+
+    const entities = [
+      ...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g),
+    ].flatMap(([, value]) => JSON.parse(value));
+    const article = entities.find(
+      (entity) =>
+        entity["@type"] === (path === "/" ? "CollectionPage" : "TechArticle"),
+    );
+    assert.ok(article, path);
+    assert.equal(new URL(article.url).href, url.href, path);
+    assert.equal(article.description, meta.description, path);
+    if (path !== "/") {
+      assert.equal(article.image[0], imageUrl.href, path);
+      assert.equal(article.dateModified, meta["article:modified_time"], path);
+      const breadcrumb = entities.find(
+        (entity) => entity["@type"] === "BreadcrumbList",
+      );
+      assert.ok(breadcrumb, path);
+      assert.equal(breadcrumb.itemListElement.at(-1).item, url.href, path);
+    }
+  });
+  assert.deepEqual(
+    [...canonicals].map((url) => new URL(url).href).sort(),
+    sitemapUrls.map((url) => new URL(url).href).sort(),
+  );
 });
 
 test("changelog disclosures keep evidence and screenshot captions in Markdown exports", async () => {
@@ -467,6 +708,7 @@ test("sitemap and LLM exports contain canonical pages without superseded copies 
     "mint",
     "nav",
     "queue",
+    "referrals",
     "strategies",
   ]) {
     const response = await fetch(`${baseUrl}/diagrams/${name}.html`);

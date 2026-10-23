@@ -207,7 +207,7 @@ test("old page, legacy, Markdown, and image URLs redirect directly to canonical 
   }
 });
 
-test("all seven diagram embeds and direct figure links survive consolidation", () => {
+test("each diagram has one canonical embed and direct figure links", () => {
   const text = pages.map((path) => readFileSync(path, "utf8")).join("\n");
   const names = [...text.matchAll(/<DocsDiagram name="([^"]+)"/g)].map(
     (match) => match[1],
@@ -219,6 +219,7 @@ test("all seven diagram embeds and direct figure links survive consolidation", (
     "mint",
     "nav",
     "queue",
+    "referrals",
     "strategies",
   ]);
   for (const name of names)

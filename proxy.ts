@@ -35,7 +35,12 @@ export default function proxy(request: NextRequest) {
     const result = rewriteDocs(pathname);
 
     if (result) {
-      return NextResponse.rewrite(new URL(result, request.nextUrl));
+      // Keep each representation at its own cache key. Next.js replaces Vary
+      // on HTML responses, so a rewritten Markdown body could share that cache.
+      const response = NextResponse.redirect(new URL(result, request.nextUrl));
+      response.headers.set("Vary", "Accept");
+      response.headers.set("Cache-Control", "private, no-store");
+      return response;
     }
   }
 

@@ -22,6 +22,7 @@ const rootOpenGraph: NonNullable<Metadata["openGraph"]> = {
       url: "/opengraph-image",
       width: 1200,
       height: 630,
+      type: "image/png",
       alt: siteConfig.seo.defaultSocialImageAlt,
     },
   ],
@@ -31,7 +32,12 @@ const rootTwitter: NonNullable<Metadata["twitter"]> = {
   card: "summary_large_image",
   title: siteConfig.name,
   description: siteConfig.description,
-  images: ["/opengraph-image"],
+  images: [
+    {
+      url: "/opengraph-image",
+      alt: siteConfig.seo.defaultSocialImageAlt,
+    },
+  ],
 };
 
 function getVerificationMetadata(): Metadata["verification"] | undefined {
@@ -150,6 +156,7 @@ export function createDocsPageMetadata(
             url: "/opengraph-image",
             width: 1200,
             height: 630,
+            type: "image/png",
             alt: siteConfig.seo.defaultSocialImageAlt,
           },
         ],
@@ -158,7 +165,6 @@ export function createDocsPageMetadata(
         ...rootTwitter,
         title: siteConfig.name,
         description,
-        images: ["/opengraph-image"],
       },
     };
   }
@@ -180,6 +186,7 @@ export function createDocsPageMetadata(
           url: pageImageUrl,
           width: 1200,
           height: 630,
+          type: "image/webp",
           alt: imageAlt,
         },
       ],
@@ -189,13 +196,15 @@ export function createDocsPageMetadata(
       ...rootTwitter,
       title: page.data.title,
       description,
-      images: [pageImageUrl],
+      images: [{ url: pageImageUrl, alt: imageAlt }],
     },
   };
 }
 
 export function getDisallowedRobotsPaths(): string[] {
-  return [siteConfig.routes.search, `${siteConfig.routes.docsContent}/`];
+  // Markdown exports advertise their HTML canonical through an HTTP Link header.
+  // Crawlers must be able to fetch them to discover that relationship.
+  return [siteConfig.routes.search];
 }
 
 export async function getSitemapEntries(): Promise<MetadataRoute.Sitemap> {

@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { permanentRedirect } from "next/navigation";
 import { siteConfig } from "@/lib/config";
 
 type RedirectPageProps = {
@@ -14,5 +14,5 @@ export default async function LegacyDocsRedirect(props: RedirectPageProps) {
       ? `${siteConfig.routes.docs}${slug.join("/")}`
       : siteConfig.routes.docs;
 
-  redirect(pathname);
+  permanentRedirect(pathname);
 }

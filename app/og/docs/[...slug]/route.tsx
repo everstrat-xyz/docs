@@ -11,6 +11,7 @@ export async function GET(
   { params }: RouteContext<"/og/docs/[...slug]">,
 ) {
   const { slug } = await params;
+  if (slug.at(-1) !== "image.webp") notFound();
   const page = source.getPage(slug.slice(0, -1));
   if (!page) notFound();
 

@@ -1,0 +1,92 @@
+---
+title: Referrals
+description: Share your personal invite code, join through a friend, and track direct referrals in Portfolio.
+---
+
+Referrals let registered wallets invite friends to Everstrat with a reusable personal code.
+A friend becomes your direct referral when they accept your invitation and the app verifies
+their wallet signature. They do not need to deposit ETH first.
+
+<Callout type="info" title="Referral earnings are not available yet">
+  **Referral earnings** shows **Coming soon**. The implementation does not calculate rewards,
+  maintain an earnings balance, or pay referral commissions. The referral count records
+  registrations, not deposits or rewards.
+</Callout>
+
+## How it works
+
+<DocsDiagram name="referrals" />
+
+Accepting an invite creates an app registration and browser session. It does not send ETH,
+mint EVE, or complete an on-chain whitelist transaction. A deposit is a separate action with
+its own risk acknowledgment, access checks, quote, and gas cost. See
+[Your first deposit](/get-started/first-mint).
+
+## Share your invite
+
+1. Open **Portfolio** and connect the wallet you registered with.
+2. Find the **Referrals** card below your position and account cards. If prompted, select
+   **Sign in with wallet** and sign the sign-in message.
+3. Your five-character **Your invite code** is shown in the card. Select **Copy invite link**
+   to copy the full link on the current app domain, with the path `/invite/<CODE>`.
+4. Send the link to your friend. They can also open `/invite` and enter the code manually.
+
+The same personal code can register multiple friends; it has no registration limit.
+It stays assigned to your wallet and cannot be edited or regenerated. Codes are public
+invitations; knowing a code does not grant access to its owner's account.
+
+## Join through a friend
+
+1. Open your friend's invite link. The invite form fills in their code automatically.
+2. Connect the wallet you want to register and switch to **Ethereum mainnet** if requested.
+3. Select **Accept invite** and review the wallet message. The referral message states
+   **Join Everstrat through a referral.** Accepting the invitation is a message signature
+   with no transaction gas fee.
+4. Once verification succeeds, the app opens **Portfolio**. You have your own personal
+   code and appear in your friend's **Your referrals** list.
+
+Opening the link or connecting a wallet alone does not record a referral. If you cancel
+the signature, you can try again. Signature challenges expire after five minutes;
+start a new attempt if yours expires.
+
+If your wallet is already registered, choose **Already a member? Sign in** instead.
+Signing in restores access without changing who invited you.
+
+## Attribution rules
+
+- **First registration fixes attribution.** A registered wallet cannot join again under
+  another personal code. There is no app action to change its referrer.
+- **Only direct invitations count.** If Alice invites Bob and Bob invites Carol, Alice sees
+  Bob; Bob sees Carol. Carol is not added to Alice's list.
+- **No self-referrals.** You cannot register your own wallet with its own code.
+- **Registration is per wallet and deployment.** A wallet address is not proof of a unique
+  person. Referral counts do not measure unique people or funded accounts.
+- **Administrative invitations have no referrer.** Wallets registered through administrative
+  invites receive personal codes without assigning the issuing administrator as their referrer.
+
+Both administrative and personal codes use the same invite form. A personal code is reusable;
+an administrative code is claimed by one wallet. Personal acceptance opens Portfolio, while
+administrative invite acceptance opens Mint.
+
+## Read your referral list
+
+**Your referrals** shows the total number of direct registrations, each wallet's explorer
+link, and its **Joined (UTC)** date. The list shows the newest registrations first, ten per
+page. Use **Previous** and **Next** to move through it, or **Refresh referrals** to return to
+the first page and load new registrations.
+
+Only the signed-in wallet can load its list. Switching wallets may require another sign-in.
+The list does not expose invitees' emails, deposits, balances, or earnings.
+
+## Common questions
+
+| Situation | What to do |
+| --- | --- |
+| A friend opened the link but is missing from the list | Ask them to finish **Accept invite** and wallet verification, then refresh your list. A visit alone does not count. |
+| The wallet is already registered | Use **Already a member? Sign in**. A different invitation cannot replace its attribution. |
+| Portfolio asks you to sign in again | Select **Sign in with wallet** for the connected registered wallet. Connecting a wallet and signing in are separate steps. |
+| Referral data fails to load | Select **Try again** or refresh. An unavailable list is not a zero referral count. |
+| You want to claim referral earnings | Reward calculations and payouts are not implemented. There is no referral claim action. |
+
+For implementation details, see [Referral registration and access](/developers/app/referrals-and-invite-access).
+For the rest of Portfolio, see [Tracking your position](/using-everstrat/tracking-your-position).

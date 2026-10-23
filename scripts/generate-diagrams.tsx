@@ -36,7 +36,7 @@ main { width: 100%; max-width: ${spec.width + 2}px; min-width: 0; margin: 0 auto
 ${css}
 @media (prefers-color-scheme: dark) {
   body { background: #191b1a; color-scheme: dark; }
-  .diagram-document .docs-diagram { ${darkTokens} }
+  .diagram-document .docs-diagram {${darkTokens} }
 }
 </style>
 </head>
