@@ -6,22 +6,22 @@ const read = (path) =>
   readFileSync(new URL(`../content/docs/${path}`, import.meta.url), "utf8");
 const compact = (path) => read(path).replace(/\s+/g, " ");
 
-test("the deployment snapshot distinguishes executed upgrade and scheduled migration", () => {
+test("the deployment snapshot records the executed upgrade and strategy migration", () => {
   const snapshot = read("operations/current-deployments.mdx");
   assert.match(snapshot, /block \*\*[\d,]+\*\*[\s\S]*?UTC/);
   assert.match(snapshot, /018: Controller 1\.1\.0[^\n]+\*\*Done\*\*/);
-  assert.match(snapshot, /019: register v2[^\n]+\*\*Waiting\*\*/);
-  assert.match(snapshot, /020: drain and remove v1[^\n]+\*\*Waiting\*\*/);
-  assert.match(snapshot, /Readiness is not automatic execution/);
+  assert.match(snapshot, /019: register v2[^\n]+\*\*Done\*\*/);
+  assert.match(snapshot, /020: drain and remove v1[^\n]+\*\*Done\*\*/);
+  assert.match(snapshot, /Retired v1 address/);
   const migration = compact("risk-and-trust/trust-and-governance.mdx");
   assert.match(
     migration,
-    /October 12 snapshot.*?Controller 1\.1\.0 was active/,
+    /October 19 snapshot.*?Controller 1\.1\.0 was active/,
   );
-  assert.match(migration, /019 and 020 were scheduled and had not executed/);
+  assert.match(migration, /019 and 020 had executed/);
   assert.match(
     migration,
-    /\/operations\/current-deployments#pending-migration/,
+    /\/operations\/current-deployments#strategy-migration/,
   );
   assert.match(
     compact("developers/contracts/controller.mdx"),
@@ -33,7 +33,7 @@ test("the role snapshot retains both verified Converter role assignments", () =>
   const snapshot = read("operations/current-deployments.mdx");
   assert.match(
     snapshot,
-    /\| `CONVERTER_CALLER_ROLE` \| Four registered v1 strategies \[listed above\]\(#registered-strategies\) \|/,
+    /\| `CONVERTER_CALLER_ROLE` \| Four registered v2 strategies \[listed above\]\(#registered-strategies\) \|/,
   );
   assert.match(
     snapshot,

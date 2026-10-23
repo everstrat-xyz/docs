@@ -69,7 +69,7 @@ This feed contains every dated entry from the five category histories, including
 
 Released entries have a successful app Production deployment; On-chain entries have an execution receipt. Code merged and Source update entries record implementation work, not a verified production activation date.
 
-Reviewed on October 15, 2026: \`app\` through \`47c0756\`, \`contracts\` through \`157129b\`, \`keepers\` through \`ec1ab3f\`, and \`governance\` through \`047f8e3\`. Some source links require organization access.
+Baseline history reviewed on October 15, 2026: \`app\` through \`47c0756\`, \`contracts\` through \`157129b\`, \`keepers\` through \`ec1ab3f\`, and \`governance\` through \`047f8e3\`. Later entries record their own verification evidence. Some source links require organization access.
 
 For dated protocol state, use [Current deployments](/operations/current-deployments). Addresses live in [Contract addresses](/reference/contract-addresses). Research experiments in \`backtests\` do not establish a live strategy. See the [release notes policy](/contributing/changelog-or-release-notes-strategy) for maintenance rules.
 

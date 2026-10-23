@@ -267,8 +267,46 @@ test("All updates renders and exports the complete category history in date orde
       assert.ok(markdown.includes(title), `Missing ${slug} entry: ${title}`);
     }
   }
-  assert.match(markdown, /Strategy migration pending/);
-  assert.match(markdown, /\/changelog\/strategies#pending-migration/);
+  assert.match(markdown, /UniCL v2 migration executed/);
+  assert.match(markdown, /\/changelog\/strategies#2026-10-19/);
+  assert.doesNotMatch(markdown, /Strategy migration pending/);
+});
+
+test("migration refresh preserves published sections and distinguishes historical state", async () => {
+  for (const [path, fragments] of [
+    [
+      "/operations/current-deployments",
+      [
+        "pending-migration",
+        "strategy-migration",
+        "migration-recheck-october-15-2026",
+        "retired-v1-strategies",
+      ],
+    ],
+    [
+      "/risk-and-trust/trust-and-governance",
+      ["current-migration", "strategy-migration"],
+    ],
+    [
+      "/changelog/strategies",
+      ["pending-migration", "unicl-v2-is-waiting-for-execution", "2026-10-19"],
+    ],
+  ]) {
+    const response = await fetch(`${baseUrl}${path}`);
+    assert.equal(response.status, 200, path);
+    const html = await response.text();
+    for (const fragment of fragments) {
+      assert.ok(html.includes(`id="${fragment}"`), `${path}#${fragment}`);
+    }
+  }
+  const snapshot = await fetch(
+    `${baseUrl}/operations/current-deployments.mdx`,
+  ).then((r) => r.text());
+  assert.match(
+    snapshot,
+    /four addresses now listed under \[Retired v1 strategies\]\(#retired-v1-strategies\)/,
+  );
+  assert.doesNotMatch(snapshot, /retain the October 12 verification boundary/);
 });
 
 test("all historical aliases return a direct 308 with working targets and preserved queries", async () => {

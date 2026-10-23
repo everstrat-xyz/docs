@@ -61,7 +61,7 @@ The registered instance list can change through governance. See [Live strategies
 ## Live strategies
 
 The canonical [dated deployment snapshot](/operations/current-deployments#registered-strategies)
-lists registered strategy addresses and pending replacements. The pool set recorded there is:
+lists the registered strategy addresses. The pool set recorded there is:
 
 | Uniswap V3 pool | Fee tier | Pool address |
 | --- | --- | --- |
@@ -83,12 +83,11 @@ Contracts [PR #53](https://github.com/everstrat-xyz/contracts/pull/53) merged Un
 It adds ratio-aware inventory swaps, incremental liquidity, route-aware withdrawal sizing,
 and a full unwind for near-full withdrawals. Shared logic lives in `UniCLStratLib`.
 
-The dated snapshot confirms Controller 1.1.0 is active after 018, enabling the timelock's
-single-strategy withdrawal. 019 registers the deployed v2 replacements; 020 drains and removes
-v1. Both are scheduled, but neither has executed at that snapshot. Check
-[Current deployments](/operations/current-deployments#pending-migration) and on-chain registration
-for migration progress. Merged source, deployed bytecode, and scheduled operations do not
-by themselves establish the active basket.
+018 upgraded the Controller to 1.1.0, enabling the timelock's single-strategy withdrawal.
+019 registered the v2 replacements on the same four pools, and 020 drained and removed v1.
+Both executed on October 19, 2026; the dated snapshot confirms that only the v2 strategies are
+registered. See [Current deployments](/operations/current-deployments#strategy-migration) for
+operation ids, execution transactions, and the retired v1 addresses.
 
 ## The calm-period check
 

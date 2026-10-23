@@ -7,7 +7,36 @@ description: New features, improvements, and fixes across Everstrat.
 
 <span id="latest-updates" />
 
-All **58 dated updates** across five components, from March 6, 2026 to October 14, 2026. Dates are UTC.
+All **59 dated updates** across five components, from March 6, 2026 to October 19, 2026. Dates are UTC.
+
+<ChangeEntry category="Strategies" status="On-chain">
+
+## 2026-10-19
+
+### UniCL v2 migration executed
+
+Governance 019 registered four v2 strategies on the existing pools. All four 020 operations
+then moved the v1 strategies' funds into Controller and removed the old instances.
+At the October 19 snapshot, only the four v2 strategies were registered and held the
+Converter caller role; the retired v1 instances reported zero NAV.
+
+Registration alone does not establish that the v2 instances are funded or continuously executing.
+
+<details className="change-details">
+<summary>Execution evidence</summary>
+
+019 executed at block **26,226,427** in
+[this transaction](https://etherscan.io/tx/0xffad87e17fae7d4f9f74b7d7cef3ecbeb346f50dd12454968b2e603bdf125fa9).
+The four 020 operations followed at blocks **26,226,428–26,226,432**.
+The [deployment snapshot](/operations/current-deployments#strategy-migration) records all five
+operation IDs and execution transactions, checked at block **26,226,476**, **11:59:35 UTC**.
+It also lists the registered v2 and retired v1 addresses.
+
+</details>
+
+[View in Strategies](/changelog/strategies#2026-10-19)
+
+</ChangeEntry>
 
 <ChangeEntry category="App" status="Released">
 
@@ -281,7 +310,7 @@ The new implementation sizes swaps for the position’s actual token ratio and u
 - Withdrawals use idle inventory first, then remove the liquidity needed.
 - Existing static strategies still require deployment and migration.
 
-**Strategy migration pending:** at the October 15, 2026 verification, the v2 registration and v1 removal operations were Ready, not executed. [Migration status and evidence](/changelog/strategies#pending-migration).
+**Subsequent mainnet activation:** the v2 registration and v1 removal operations executed on October 19, 2026. [Migration execution and evidence](/changelog/strategies#2026-10-19).
 
 
 <details className="change-details">
@@ -297,7 +326,7 @@ income. Shared logic moved into the linked `UniCLStratLib`.
 
 Source: [contracts #53](https://github.com/everstrat-xyz/contracts/pull/53),
 [merge 157129b](https://github.com/everstrat-xyz/contracts/commit/157129b7c7f3db06275ecc6697ff0acfab3d9dbe).
-Mainnet activation requires new deployments and migration; see [Pending migration](/changelog/strategies#pending-migration).
+Mainnet activation followed through new deployments and the [October 19 migration](/changelog/strategies#2026-10-19).
 
 </details>
 
@@ -1911,7 +1940,7 @@ This feed contains every dated entry from the five category histories, including
 
 Released entries have a successful app Production deployment; On-chain entries have an execution receipt. Code merged and Source update entries record implementation work, not a verified production activation date.
 
-Reviewed on October 15, 2026: `app` through `47c0756`, `contracts` through `157129b`, `keepers` through `ec1ab3f`, and `governance` through `047f8e3`. Some source links require organization access.
+Baseline history reviewed on October 15, 2026: `app` through `47c0756`, `contracts` through `157129b`, `keepers` through `ec1ab3f`, and `governance` through `047f8e3`. Later entries record their own verification evidence. Some source links require organization access.
 
 For dated protocol state, use [Current deployments](/operations/current-deployments). Addresses live in [Contract addresses](/reference/contract-addresses). Research experiments in `backtests` do not establish a live strategy. See the [release notes policy](/contributing/changelog-or-release-notes-strategy) for maintenance rules.
 
