@@ -182,6 +182,133 @@ test("all canonical pages and Markdown exports respond with their expected type"
   });
 });
 
+test("changelog disclosures keep evidence and screenshot captions in Markdown exports", async () => {
+  const html = await fetch(`${baseUrl}/changelog/app`).then((r) => r.text());
+  assert.match(html, /aria-label="Filter changelog by component"/);
+  assert.equal([...html.matchAll(/id="2026-10-14"/g)].length, 1);
+  assert.match(html, /<details class="change-details">/);
+  assert.doesNotMatch(html, /<details[^>]*\bopen(?:=|\s|>)/);
+  assert.match(html, /class="change-screenshot-mark"/);
+
+  const markdown = await fetch(`${baseUrl}/changelog/app.mdx`).then((r) =>
+    r.text(),
+  );
+  assert.match(markdown, /2026-10-14/);
+  assert.match(markdown, /https:\/\/github\.com\/everstrat-xyz\/app\/pull\/15/);
+  assert.match(markdown, /7062176549/);
+  assert.match(markdown, /historical snapshot/);
+  assert.match(markdown, /example data/);
+  for (const asset of [
+    "metrics-earnings.png",
+    "portfolio-history.png",
+    "snapshot-sharing.png",
+    "admin-snapshot.png",
+    "public-snapshot.png",
+    "wallet-connection.png",
+    "invite-access.png",
+  ]) {
+    const response = await fetch(`${baseUrl}/changelog/${asset}`);
+    assert.equal(response.status, 200, asset);
+    assert.match(response.headers.get("content-type"), /^image\/png\b/, asset);
+    await response.arrayBuffer();
+  }
+});
+
+test("the GitHub sidebar link is named and its decorative SVG is hidden from accessibility", async () => {
+  const html = await fetch(`${baseUrl}/changelog/app`).then((r) => r.text());
+  const link = [...html.matchAll(/<a\b[^>]*>[\s\S]*?<\/a>/g)]
+    .map(([anchor]) => anchor)
+    .find((anchor) =>
+      anchor.includes('href="https://github.com/everstrat-xyz"'),
+    );
+  assert.ok(link, "GitHub organization link is present");
+  assert.match(link, /aria-label="GitHub"/);
+  assert.match(link, /<svg[^>]*aria-hidden="true"/);
+  assert.doesNotMatch(link, /<svg[^>]*role="img"/);
+});
+
+test("All updates renders and exports the complete category history in date order", async () => {
+  const categories = JSON.parse(
+    readFileSync(join(contentRoot, "changelog/meta.json"), "utf8"),
+  ).pages.filter((slug) => slug !== "index");
+  const expected = categories.flatMap((slug) => {
+    const content = readFileSync(
+      join(contentRoot, `changelog/${slug}.mdx`),
+      "utf8",
+    );
+    return [...content.matchAll(/^## (\d{4}-\d{2}-\d{2})$/gm)].map(
+      (match) => match[1],
+    );
+  });
+  const html = await fetch(`${baseUrl}/changelog`).then((r) => r.text());
+  assert.deepEqual(
+    [...html.matchAll(/datetime="(\d{4}-\d{2}-\d{2})"/gi)].map(
+      (match) => match[1],
+    ),
+    expected.sort().reverse(),
+  );
+  assert.equal(
+    [...html.matchAll(/<figure class="change-screenshot">/g)].length,
+    7,
+  );
+  const markdown = await fetch(`${baseUrl}/changelog.mdx`).then((r) =>
+    r.text(),
+  );
+  for (const slug of categories) {
+    const content = readFileSync(
+      join(contentRoot, `changelog/${slug}.mdx`),
+      "utf8",
+    );
+    for (const [entry] of content.matchAll(
+      /<ChangeEntry\b[^>]*>[\s\S]*?<\/ChangeEntry>/g,
+    )) {
+      if (!/^## \d{4}-\d{2}-\d{2}$/m.test(entry)) continue;
+      const title = entry.match(/^### (.+)$/m)[1];
+      assert.ok(markdown.includes(title), `Missing ${slug} entry: ${title}`);
+    }
+  }
+  assert.match(markdown, /UniCL v2 migration executed/);
+  assert.match(markdown, /\/changelog\/strategies#2026-10-19/);
+  assert.doesNotMatch(markdown, /Strategy migration pending/);
+});
+
+test("migration refresh preserves published sections and distinguishes historical state", async () => {
+  for (const [path, fragments] of [
+    [
+      "/operations/current-deployments",
+      [
+        "pending-migration",
+        "strategy-migration",
+        "migration-recheck-october-15-2026",
+        "retired-v1-strategies",
+      ],
+    ],
+    [
+      "/risk-and-trust/trust-and-governance",
+      ["current-migration", "strategy-migration"],
+    ],
+    [
+      "/changelog/strategies",
+      ["pending-migration", "unicl-v2-is-waiting-for-execution", "2026-10-19"],
+    ],
+  ]) {
+    const response = await fetch(`${baseUrl}${path}`);
+    assert.equal(response.status, 200, path);
+    const html = await response.text();
+    for (const fragment of fragments) {
+      assert.ok(html.includes(`id="${fragment}"`), `${path}#${fragment}`);
+    }
+  }
+  const snapshot = await fetch(
+    `${baseUrl}/operations/current-deployments.mdx`,
+  ).then((r) => r.text());
+  assert.match(
+    snapshot,
+    /four addresses now listed under \[Retired v1 strategies\]\(#retired-v1-strategies\)/,
+  );
+  assert.doesNotMatch(snapshot, /retain the October 12 verification boundary/);
+});
+
 test("all historical aliases return a direct 308 with working targets and preserved queries", async () => {
   const redirects = await config.redirects();
   await each(redirects, async (rule) => {

@@ -1,0 +1,310 @@
+---
+title: Strategy updates
+description: Strategy improvements, pool additions, and migrations.
+---
+
+<ChangeEntry category="Strategies" status="On-chain">
+
+## 2026-10-19
+
+### UniCL v2 migration executed
+
+Governance 019 registered four v2 strategies on the existing pools. All four 020 operations
+then moved the v1 strategies' funds into Controller and removed the old instances.
+At the October 19 snapshot, only the four v2 strategies were registered and held the
+Converter caller role; the retired v1 instances reported zero NAV.
+
+Registration alone does not establish that the v2 instances are funded or continuously executing.
+
+<details className="change-details">
+<summary>Execution evidence</summary>
+
+019 executed at block **26,226,427** in
+[this transaction](https://etherscan.io/tx/0xffad87e17fae7d4f9f74b7d7cef3ecbeb346f50dd12454968b2e603bdf125fa9).
+The four 020 operations followed at blocks **26,226,428–26,226,432**.
+The [deployment snapshot](/operations/current-deployments#strategy-migration) records all five
+operation IDs and execution transactions, checked at block **26,226,476**, **11:59:35 UTC**.
+It also lists the registered v2 and retired v1 addresses.
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Strategies" status="Code merged">
+
+## 2026-10-01
+
+### UniCL v2 makes better use of inventory
+
+The new implementation sizes swaps for the position’s actual token ratio and uses leftover inventory in an alternate position.
+
+- Deposits can add liquidity without rebuilding the whole position.
+- Withdrawals use idle inventory first, then remove the liquidity needed.
+- Existing static strategies still require deployment and migration.
+
+**Subsequent mainnet activation:** the v2 registration and v1 removal operations executed on October 19, 2026. [Migration execution and evidence](#2026-10-19).
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### UniCLStrat 2.0.0 implementation
+
+**Merged.** Added ratio-aware inventory swaps, an alternate position built from actual leftovers,
+and incremental liquidity additions. Withdrawals use idle inventory before partially burning
+positions, size swaps against the actual route, and fully unwind near-full withdrawals.
+Partial collection rebases the LP-fee snapshot so returned principal does not become performance-fee
+income. Shared logic moved into the linked `UniCLStratLib`.
+
+Source: [contracts #53](https://github.com/everstrat-xyz/contracts/pull/53),
+[merge 157129b](https://github.com/everstrat-xyz/contracts/commit/157129b7c7f3db06275ecc6697ff0acfab3d9dbe).
+Mainnet activation followed through new deployments and the [October 19 migration](#2026-10-19).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Strategies" status="On-chain">
+
+## 2026-09-26
+
+### UNI/WETH joins the strategy basket
+
+The re-deployed UNI/WETH 0.30% strategy is registered, bringing the basket to four strategies at execution.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### UNI/WETH 0.30% strategy registered
+
+**Executed on mainnet.** Registered the re-deployed UNI/WETH strategy with deposit/withdrawal
+weights **10 / 10**, bringing the registered basket to four strategies at that execution.
+This is governance record 017. The earlier record 015 was withdrawn before timelock scheduling
+and did not activate its proposed strategy.
+
+Evidence: [governance 017](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/017-strategy-manager-add-unicl-uni-weth-strategy),
+[execution receipt](https://etherscan.io/tx/0x3668b911fe773a6a8dec417a49334cbbbbcd474a5ee4dba264518ff950bd30ac),
+block **26,061,446**, **11:52:11 UTC**.
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Strategies" status="Code merged">
+
+## 2026-09-22
+
+### Rebalance only when there is work to do
+
+The strategy health check no longer requests a rebalance while a pool is non-calm. Existing instances need migration to receive this implementation change.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Rebalance health predicate corrected
+
+**Merged.** `isHealthy()` reports no actionable rebalance for paused or non-calm pools.
+The rebalance trigger now requires a calm, unpaused, drifted strategy. Deposit capacity still
+independently falls to zero when paused or non-calm. This change applies to newly deployed builds;
+existing static instances require migration. The interim off-chain mitigation is recorded in
+[Automation](/changelog/automation#2026-09-19).
+
+Source: [contracts #51](https://github.com/everstrat-xyz/contracts/pull/51).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Strategies" status="On-chain">
+
+## 2026-09-16
+
+### WETH/USDT joins the strategy basket
+
+The WETH/USDT 0.30% strategy is registered with deposit and withdrawal weights of 45 / 45.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### WETH/USDT 0.30% strategy registered
+
+**Executed on mainnet.** Added the WETH/USDT strategy with deposit/withdrawal weights **45 / 45**.
+Registration also authorized the strategy as a Converter caller.
+
+Evidence: [governance 011](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/011-strategy-manager-add-unicl-weth-usdt-strategy),
+[execution receipt](https://etherscan.io/tx/0x1807f0d15a843933f12c9eb8b1af45bb8a1334867d49931959d89845c084b72e),
+block **25,989,831**, **11:46:59 UTC**.
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Strategies" status="On-chain">
+
+## 2026-09-15
+
+### The first two USDC/WETH strategies are registered
+
+USDC/WETH strategies join the basket for the 0.30% and 0.01% pools, with weights of 40 / 40 and 15 / 15.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### First two USDC/WETH strategies registered
+
+**Executed on mainnet.** Added USDC/WETH strategies for the **0.30%** and **0.01%** pools with
+deposit/withdrawal weights **40 / 40** and **15 / 15**, respectively. Each registration granted
+Converter caller permission.
+
+Evidence: [governance 009](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/009-strategy-manager-add-unicl-strategies).
+The [0.30% registration](https://etherscan.io/tx/0xd592550de1b0ae6c4a9ab3412d2ffc919fb9af5523a798c02c355d4eb4c02b6c)
+executed at block **25,983,233**, **13:42:35 UTC**; the
+[0.01% registration](https://etherscan.io/tx/0x558a69879f1f4467dadfacc7900cae95ec19a5dbb50404360a4a7931986f5960)
+at block **25,983,238**, **13:43:47 UTC**.
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Strategies" status="Code merged">
+
+## 2026-09-12
+
+### USDT behavior tested on a mainnet fork
+
+New fork tests exercise UniCLStrat with real USDT behavior before strategy registration.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Real-USDT fork coverage
+
+**Merged.** Added mainnet-fork coverage for UniCLStrat against real USDT behavior. This is validation
+of the implementation, not the strategy's registration date.
+
+Source: [contracts #50](https://github.com/everstrat-xyz/contracts/pull/50).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Strategies" status="Code merged">
+
+## 2026-09-11
+
+### Bootstrap settings checked against mainnet
+
+Fork tests validate UniCLStrat’s mainnet bootstrap parameters before registration.
+
+
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Bootstrap configuration fork checks
+
+**Merged.** Added fork validation of UniCLStrat mainnet bootstrap parameters before registration.
+
+Source: [contracts #48](https://github.com/everstrat-xyz/contracts/pull/48).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Strategies" status="Code merged">
+
+## 2026-08-17
+
+### Stronger strategy recovery and pool checks
+
+Strategy pause and ETH recovery can proceed when a paired token fails.
+
+- Pool configuration must match the trusted factory.
+- TWAP history is checked at construction and when settings change.
+- Pause is still best-effort recovery, not proof that all assets were recovered.
+
+
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+#### Circuit-breaker and pool-validation hardening
+
+**Merged.** Isolated best-effort paired-token allowance revocation and token recovery so a degraded
+paired token does not roll back the pause or ETH sweep. Added factory provenance checks for pools,
+and construction/configuration checks for TWAP availability and observation cardinality.
+Pause remains best-effort recovery; it does not prove that all pool liquidity was recovered.
+
+Source: [contracts #42](https://github.com/everstrat-xyz/contracts/pull/42).
+
+</details>
+
+</ChangeEntry>
+
+<span id="pending-migration" className="block scroll-m-28" />
+
+## Historical migration check
+
+<span id="unicl-v2-is-waiting-for-execution" className="block scroll-m-28" />
+
+### UniCL v2 was Ready on October 15
+
+At the October 15 check, the registration and removal operations were **Ready, not executed**. The basket still contained four v1 strategies; Controller 1.1.0 was active.
+
+- 019 was ready to register the v2 replacements.
+- 020 was ready to drain and remove v1 after 019.
+- Both subsequently executed in the [October 19 migration](#2026-10-19).
+
+<details className="change-details">
+<summary>Verification & sources</summary>
+
+**Verification: October 15, 2026, 19:18:11 UTC, Ethereum mainnet block 26,199,960.**
+Governance 019 and all four 020 operations were **Ready**, not executed. The registered strategy
+list still contained the four v1 instances. Controller 1.1.0 was active.
+
+- **019** registers four deployed UniCL v2 replacements. Registration alone moves no capital.
+- **020** drains and removes the four v1 instances; its operations depend on 019.
+- A completed migration requires execution receipts and the resulting basket state. Reaching
+  the timelock's ready-at time does not execute a transaction.
+
+Sources: [governance #33](https://github.com/everstrat-xyz/governance/pull/33),
+[019 payload](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/019-strategy-manager-register-unicl-v2-strategies),
+and [020 payload](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/020-strategy-manager-drain-remove-unicl-v1-strategies).
+The pinned block, operation IDs, and verification boundary are recorded in the
+[migration recheck](/operations/current-deployments#migration-recheck-october-15-2026).
+Older proposal-status prose predates scheduling and is not the authority for this check.
+
+</details>
+
+<details className="change-details">
+<summary>About this history</summary>
+
+Dates are UTC. **Merged** entries describe implementation changes. UniCLStrat instances are static:
+an implementation merge does not update an existing instance. **Executed on mainnet** entries
+include the registration receipt and block. Registration alone does not establish funding,
+health, or continuous execution. The canonical address inventory and basket state remain in
+[Current deployments](/operations/current-deployments#registered-strategies).
+
+</details>

@@ -11,6 +11,9 @@ This read-only snapshot is pinned to Ethereum mainnet block **26,226,476**
 It does not refresh automatically.
 The app uses chain ID **1**.
 
+The tables above the [historical October 15 recheck](#migration-recheck-october-15-2026)
+all use the October 19 snapshot. The recheck preserves the earlier migration state.
+
 Entry remains invite-gated: `Whitelist.disabled()` returned `false`.
 A deployed address or a merged PR is not an announcement of unrestricted access.
 
@@ -31,7 +34,7 @@ which integrations should call.
 | `StrategyManager.performanceFeeBps()` | `1500` | 15% of eligible accrued Uniswap V3 LP fees; it is not charged on deposits |
 | `StrategyManager.daoTreasury()` | `0x1780C78eB50cD28dC349CEA8452eD1F7206D8fF9` | Recipient of fee EVE |
 | `Timelock.getMinDelay()` | `172800 seconds` | 48-hour scheduling delay |
-| `Controller.version()` | `1.1.0` | 018 executed; ADMIN or KEEPER may withdraw from a single strategy |
+| `Controller.version()` | `1.1.0` | 018 executed; ADMIN or KEEPER may move a single strategy's funds into Controller |
 | Both keeper executors' `version()` | `2.1.0-mimic` | Mimic executor contracts |
 | `QueueKeeperExecutor.minBatchAge()` | `86400 seconds` | A batch can be priced automatically once it is 24 hours old |
 | `StrategyKeeperExecutor.controllerReserveETH()` | `0.05 ETH` | Controller reserve target |
@@ -90,13 +93,15 @@ Both executors allow the Mimic caller `0x41153f0c36f8Fb5c38396573dDB487AC95a9825
 This is an executor caller allowlist. The account itself holds no `KEEPER_ROLE`.
 Allowlisting alone does not prove uninterrupted off-chain task execution.
 
+<span id="pending-migration" className="block scroll-m-28" />
+
 ## Strategy migration
 
 | Governance record | Chain state at the snapshot | Effect |
 | --- | --- | --- |
-| [018: Controller 1.1.0](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/018-controller-upgrade-v1.1.0) | **Done**, executed | Added ADMIN access to the single-strategy withdrawal function |
+| [018: Controller 1.1.0](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/018-controller-upgrade-v1.1.0) | **Done**, executed | Added ADMIN access to the single-strategy withdrawal function (funds return to Controller only) |
 | [019: register v2 strategies](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/019-strategy-manager-register-unicl-v2-strategies) | **Done**, executed | Registered the four v2 strategies |
-| [020: drain and remove v1](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/020-strategy-manager-drain-remove-unicl-v1-strategies) | All four operations **Done**, executed | Withdrew from and removed the four v1 strategies |
+| [020: drain and remove v1](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/020-strategy-manager-drain-remove-unicl-v1-strategies) | All four operations **Done**, executed | Moved the four v1 strategies' funds into Controller and removed them |
 
 Record 018 executed at block **26,176,319** (**October 12, 12:13:23 UTC**), in
 [this transaction](https://etherscan.io/tx/0xd3e005e636591e9c91c9c237be11d778baa1b31a18ca6b7af4ddb3750a9e2c33).
@@ -117,6 +122,8 @@ The Controller proxy's implementation slot points to
 The linked proposal files describe intended payloads; their older status prose is not
 the authority for this pinned chain state.
 
+### Retired v1 strategies
+
 At the snapshot block the retired v1 strategies were absent from `StrategyManager.strategies()`,
 held no `CONVERTER_CALLER_ROLE`, and reported `navInETH() = 0`:
 
@@ -126,6 +133,31 @@ held no `CONVERTER_CALLER_ROLE`, and reported `navInETH() = 0`:
 | USDC/WETH 0.01% | `0x59C476c1817b23791d96F35b9f468E6d9A242252` |
 | WETH/USDT 0.30% | `0x3Fb6B9174427CA4FF38728398F4F4CB526F66501` |
 | UNI/WETH 0.30% | `0x956fE55DB50527E75c1fcA679adE509AD89cAFDd` |
+
+## Migration recheck: October 15, 2026
+
+A read-only recheck of **Controller version, timelock states, and the registered strategy list**
+was pinned to Ethereum mainnet block **26,199,960**, **October 15, 2026, 19:18:11 UTC**, hash
+`0x47bf3b2566e613ed44e5109dfcef849681ff828f06643dfae3a5f7440bbd0a08`.
+This historical check covered only the three reads named above. The current balances,
+settings, and role holders use the October 19 snapshot at the top of this page.
+
+| Read | Result at block 26,199,960 |
+| --- | --- |
+| `Controller.version()` | `1.1.0` |
+| 018 operation `0x8cc3710fc1e770419105d3974350f2de05eb8a575e8057bf602fd28830b7c98a` | `3` — **Done** |
+| 019 operation `0xf558cda6b3831a4fb393278e368ff3b319c04696e37ebb034d31c463fc9ed6a6` | `2` — **Ready** |
+| 020 USDC/WETH 0.30% operation `0xfa9e716cf5547d760c68e8758a4900a0644df7490af3fbee8a9ccf56ed7493d5` | `2` — **Ready** |
+| 020 USDC/WETH 0.01% operation `0xe9438cb7438f47c22b1e74477c013d86870cb08f7080080844d3532dacef75c8` | `2` — **Ready** |
+| 020 WETH/USDT 0.30% operation `0xe680e96963678090ac5854516999bf7c770284e622e66c014e04c689b9265bd9` | `2` — **Ready** |
+| 020 UNI/WETH 0.30% operation `0x93ee86d5f12f2b739647a886d51e7dce3baeb77c02809d4c0d10fcf3b81f4cd2` | `2` — **Ready** |
+| `StrategyManager.strategies()` | The four addresses now listed under [Retired v1 strategies](#retired-v1-strategies) |
+
+019 and 020 had not executed at this block. The passing of their ready-at times did not activate
+the migration. They subsequently executed on October 19, as recorded under
+[Strategy migration](#strategy-migration). The [strategy changelog](/changelog/strategies#2026-10-19) links the execution
+to the implementation and proposal history; [contract updates](/changelog/contracts#2026-10-12)
+record the separately executed Controller upgrade.
 
 ## Data and source references
 

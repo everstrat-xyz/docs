@@ -1,27 +1,88 @@
 ---
 title: Release notes policy
-description: Contributor policy for recording deployment, app, data, and documentation changes.
+description: How to maintain the public changelog with dated source, deployment, and execution evidence.
 ---
 
 ## Recommended Strategy
 
 This page describes how to author release notes. It is not a release history.
-Keep release records near the surfaces that actually change:
+Read the public [Changelog](/changelog) for the dated history.
 
-- contract deployment changes in `operations`
-- frontend behavior changes in `everstrat-xyz/app`, linked from Developers / App
-- data model or endpoint changes near their app/subgraph source, linked from Developers / Data
+| Changelog page | Owns |
+| --- | --- |
+| [App](/changelog/app) | User-facing UI, wallets, access, transaction flows, and admin UI |
+| [Contracts](/changelog/contracts) | Core protocol implementation, upgrades, permissions, fees, and oracle configuration |
+| [Strategies](/changelog/strategies) | Strategy implementation, registration, removal, weights, limits, and migration |
+| [Automation](/changelog/automation) | Off-chain keeper functions, execution policies, and executor caller/configuration changes |
+| [Data & Integrations](/changelog/data-and-integrations) | Indexing, schemas, historical data, analytics collection, and integration behavior |
 
-## Minimum Useful Entry
+Lead with a short, benefit-oriented headline, one plain-language paragraph, and a few changes a reader can scan. Group related work into an update instead of listing every commit. Put PR links, deployment IDs, receipts, and detailed verification boundaries inside the entry’s **Details & sources** disclosure. Keep important activation limits, pending status, and required user actions visible.
+
+For App interface changes, use real screenshots with numbered highlights and a readable caption. Label development previews and example or historical data. A screenshot is supporting context, not evidence of current balances or acceptance on every device.
+
+Use one canonical entry for each event. Link related categories instead of copying the full text.
+A source merge and its later production activation are distinct dated events and should link to
+one another. Governance records provide proposal and transaction evidence for the owning category;
+they do not require a duplicate governance changelog.
+
+The [All updates feed](/changelog#latest-updates) combines every dated entry from all five category
+pages, newest first. Edit entries in their category page, then run `bun run changelog:gen` (also
+included in `docs:gen`, `dev`, and `build`). Do not edit the generated `changelog/index.mdx` directly.
+Pending migration remains a separately labeled verification status. Keep these pages in the existing MDX source collection so search,
+Markdown exports, LLM exports, and the sitemap discover them together.
+
+## Dates and evidence
+
+Use ISO dates (`YYYY-MM-DD`) in UTC, newest first. Keep the date heading stable for incoming links.
+Group same-day changes under that heading and state one of these evidence boundaries:
+
+- **Production deployment:** a successful production deployment of the exact referenced commit;
+  record its deployment ID and the success time when available.
+- **Executed on mainnet:** a successful execution receipt, block, and block timestamp. For proxy
+  upgrades or strategy activation, also verify the resulting version or registration state at a
+  pinned block in Operations.
+- **Merged:** the PR merge date in UTC. Inspect its final diff and merge commit, including follow-up
+  commits; PR descriptions can describe an earlier iteration.
+- **Committed:** the committer date in UTC of a source change without a suitable merged PR.
+
+Merged and Committed entries do not assert production activation. Preserve uncertainty when an old
+deployment record is unavailable; do not invent release dates, historical versions, or a shared
+protocol version from `package.json` values. A deployed strategy is not necessarily registered,
+funded, healthy, or continuously executing.
+
+Keep pending changes in a separate section with their last verified block and date. Distinguish
+proposed, scheduled/Waiting, Ready, Done, cancelled, and withdrawn. Ready is not executed. When an
+operation executes, add a dated execution entry and replace the pending summary with a link to it.
+Do not rewrite historical entries to imply that a later event had already happened.
+
+## Minimum useful entry
 
 Each release note should record:
 
-- date
-- changed workspace
-- changed addresses, endpoints, or UX behavior
-- whether docs were updated in the same change set
+- date, affected component, and a descriptive heading
+- evidence status and a concise explanation of the behavior change and its impact
+- required user/operator action, including breaking interfaces or trigger changes
+- PR and/or commit link; deployment evidence or execution receipt when asserting activation
+- related documentation links, updated in the same change set when behavior changes
 
-For deployment records, distinguish proposed, scheduled, Ready, and executed changes.
-Include the pinned block and execution receipt when reporting a live change. Update the
+Use existing component versions when verified; date-based app entries are sufficient. Record
+Added/Changed/Fixed/Removed as needed in the prose or bullets, without empty template sections.
+Public summaries must stand on their own when source links require private-repository access.
+
+Keep canonical addresses out of duplicate inventories in the changelog. Link the
+[address reference](/reference/contract-addresses) and the relevant pinned Operations snapshot;
+an execution receipt still identifies the immutable historical event. Update the
 [current deployment snapshot](/operations/current-deployments) and
 [canonical address reference](/reference/contract-addresses) as their evidence changes.
+
+## Maintenance workflow
+
+1. Review the final source change and identify whether it needs a notable public entry.
+2. Add or update the owning category entry and related behavior documentation in a docs PR.
+3. Verify deployment or execution before claiming activation, and record remaining acceptance gaps.
+4. Add a link to the overview for a recent event; keep it ordered by event date, not publication date.
+5. Run the content, navigation, lint, type, build, and HTTP Markdown checks in the repository README.
+   Verify date anchors, search, and exports after adding pages.
+
+Keep research-only strategy experiments outside the live-strategy history. Routine formatting,
+dependency-only changes, and superseded implementation iterations usually do not need entries.

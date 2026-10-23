@@ -1,0 +1,12 @@
+{
+  "title": "Changelog",
+  "icon": "RotateCcwClock",
+  "pages": [
+    "index",
+    "app",
+    "contracts",
+    "strategies",
+    "automation",
+    "data-and-integrations"
+  ]
+}
