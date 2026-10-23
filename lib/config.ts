@@ -72,13 +72,47 @@ function normalisePath(pathname: string): string {
 }
 
 export function getSiteUrl(): URL {
-  const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? defaultSiteUrl;
+  const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  const isProductionDeployment = process.env.VERCEL_ENV === "production";
+
+  if (!configuredSiteUrl && isProductionDeployment) {
+    throw new Error(
+      "NEXT_PUBLIC_SITE_URL is required for production deployments.",
+    );
+  }
+
+  let url: URL;
 
   try {
-    return new URL(configuredSiteUrl);
+    url = new URL(configuredSiteUrl || defaultSiteUrl);
   } catch {
-    return new URL(defaultSiteUrl);
+    throw new Error("NEXT_PUBLIC_SITE_URL must be an absolute HTTP(S) origin.");
   }
+
+  if (
+    !["http:", "https:"].includes(url.protocol) ||
+    url.username ||
+    url.password ||
+    url.pathname !== "/" ||
+    url.search ||
+    url.hash
+  ) {
+    throw new Error("NEXT_PUBLIC_SITE_URL must be an absolute HTTP(S) origin.");
+  }
+
+  if (
+    isProductionDeployment &&
+    (url.protocol !== "https:" ||
+      /^(localhost|.*\.localhost|127\..*|0\.0\.0\.0|\[::1\])$/.test(
+        url.hostname,
+      ))
+  ) {
+    throw new Error(
+      "NEXT_PUBLIC_SITE_URL must use a public HTTPS origin in production.",
+    );
+  }
+
+  return url;
 }
 
 export function getAbsoluteUrl(

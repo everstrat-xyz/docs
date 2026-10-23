@@ -120,6 +120,10 @@ These are generated from shared helpers rather than hardcoded in individual page
 ## Metadata And Public URL
 
 The app uses `NEXT_PUBLIC_SITE_URL` to compute absolute metadata URLs.
+Set it at build time to the docs origin, without a path, query, or fragment. Invalid
+values fail validation. Vercel production builds require an explicit public HTTPS
+origin, so a missing variable cannot silently publish `localhost` canonical or image
+URLs. Local builds default to `http://localhost:3000`.
 The sidebar links use the official website and application URLs by default. Override
 `NEXT_PUBLIC_WEBSITE_URL` or `NEXT_PUBLIC_APP_URL` to point them at another environment.
 Optional verification tags can be supplied with:
@@ -144,6 +148,28 @@ For production, set it to the final docs domain:
 ```bash
 NEXT_PUBLIC_SITE_URL=https://docs.example.com
 ```
+
+## Social Previews And Indexing
+
+`lib/social-image.tsx` is the shared Everstrat template. Takumi renders the logo,
+page title, and frontmatter description to 1200 × 630 images during the production
+build. The home page uses `/opengraph-image` (PNG); `/twitter-image` remains available
+with the same home image. Each article uses `/og/docs/<slug>/image.webp` for both
+Open Graph and Twitter/X. No browser rendering or external image service is needed.
+
+`lib/metadata.ts` supplies absolute image URLs, MIME types, dimensions, and alt text.
+Article JSON-LD uses the same image URL and Git-based modification date. Changes to
+frontmatter or the template take effect after rebuilding and deploying. Social
+platforms cache their own previews and may need a fresh scrape after deployment.
+
+The sitemap contains canonical HTML pages only. Markdown exports remain crawlable
+and send an HTTP `Link: <HTML URL>; rel="canonical"` header. Requests that prefer
+Markdown receive a temporary redirect to that export, with `Vary: Accept` and
+`Cache-Control: private, no-store`. This gives HTML and Markdown separate cache
+URLs; Next.js replaces custom `Vary` headers on HTML responses. Explicit `.mdx`
+requests still return Markdown directly. The aggregate `llms.txt` and
+`llms-full.txt` files send `X-Robots-Tag: noindex, follow` while remaining accessible
+to agents.
 
 ## Local Development
 
@@ -198,11 +224,18 @@ Notes:
 - `bun run docs:gen` refreshes generated Fumadocs source files under `.source`
 - `bun run types:check` regenerates Next route types before running TypeScript
 - `bun run test:markdown` requires a production build, starts a temporary local server, and checks
-  Markdown suffix/Accept requests, legacy `/docs/*` paths, HTML responses, and discovery endpoints
+  Markdown suffix/Accept requests, legacy `/docs/*` paths, discovery endpoints, and every page's
+  SEO metadata, JSON-LD, sitemap membership, and social image response/dimensions
 
 `package.json` overrides Lightning CSS to 1.33.0 so Tailwind can optimize Fumadocs search
 `::highlight(fd-search)` styles without parser warnings. Keep this override until Tailwind's
 own dependency includes that support.
+
+The docs shell loads the Inter Latin variable font through `next/font/local` from
+`app/fonts/inter-latin-variable.woff2` (weights 100–900). The file comes from Google
+Fonts' [Inter distribution](https://fonts.google.com/specimen/Inter) and is covered
+by the adjacent SIL Open Font License. It is preloaded and self-hosted, so production
+builds do not need to download the UI font from Google Fonts.
 
 ## Writing Documentation
 

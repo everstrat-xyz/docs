@@ -7,7 +7,7 @@
     "dev": "next dev --turbopack",
     "start": "next start",
     "docs:gen": "fumadocs-mdx",
-    "test:docs": "node --test scripts/docs-navigation.test.mjs",
+    "test:docs": "node --test scripts/docs-navigation.test.mjs scripts/docs-site-config.test.mjs",
     "diagrams:gen": "bun scripts/generate-diagrams.tsx",
     "test:content": "node --test scripts/docs-protocol-content.test.mjs",
     "test:markdown": "node --test scripts/docs-markdown-http.test.mjs",

@@ -1,14 +1,17 @@
 import { RootProvider } from "fumadocs-ui/provider/next";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 import { AnalyticsConsent } from "@/components/analytics-consent";
 import { siteConfig } from "@/lib/config";
 import { rootMetadata } from "@/lib/metadata";
 import { getSiteJsonLd, JsonLd } from "@/lib/structured-data";
 import "./global.css";
 
-const inter = Inter({
-  subsets: ["latin"],
+const inter = localFont({
+  src: "./fonts/inter-latin-variable.woff2",
+  weight: "100 900",
+  style: "normal",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
