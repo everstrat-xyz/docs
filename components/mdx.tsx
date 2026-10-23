@@ -7,6 +7,7 @@ import defaultMdxComponents from "fumadocs-ui/mdx";
 import { ArrowRight } from "lucide-react";
 import type { MDXComponents } from "mdx/types";
 import type { ComponentProps } from "react";
+import { ChangeEntry, ChangeScreenshot } from "./changelog";
 import { DocsDiagram } from "./docs-diagram";
 
 function DocsCallout(props: ComponentProps<typeof Callout>) {
@@ -42,6 +43,8 @@ export function getMDXComponents(components?: MDXComponents) {
     Tab,
     Tabs,
     DocsDiagram,
+    ChangeEntry,
+    ChangeScreenshot,
     ...components,
   } satisfies MDXComponents;
 }

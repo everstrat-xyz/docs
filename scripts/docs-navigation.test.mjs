@@ -4,6 +4,7 @@ import { dirname, join, relative } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import config from "../next.config.mjs";
+import { createChangelogIndex } from "./generate-changelog.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const contentRoot = join(root, "content/docs");
@@ -42,6 +43,29 @@ const aliases = [
     "/contributing/how-docs-should-be-maintained",
   ],
 ];
+
+test("All updates is generated from every category entry without a curated cutoff", () => {
+  assert.equal(read("changelog/index.mdx"), createChangelogIndex());
+  const categories = meta("changelog/meta.json").pages.filter(
+    (slug) => slug !== "index",
+  );
+  const datedEntries = (text) => [
+    ...text.matchAll(/^## (\d{4}-\d{2}-\d{2})$/gm),
+  ];
+  const expected = categories.flatMap((slug) =>
+    datedEntries(read(`changelog/${slug}.mdx`)).map((match) => match[1]),
+  );
+  const actual = datedEntries(read("changelog/index.mdx")).map(
+    (match) => match[1],
+  );
+  assert.ok(actual.length >= 58);
+  assert.deepEqual(actual, expected.sort().reverse());
+  assert.ok(
+    [...read("changelog/app.mdx").matchAll(/<ChangeScreenshot name=/g)]
+      .length >= 7,
+    "App keeps annotated screenshots",
+  );
+});
 
 test("shared page tree and home cards put Introduction before Get Started", () => {
   assert.deepEqual(meta("meta.json").pages.slice(0, 3), [
@@ -202,7 +226,7 @@ test("each diagram has one canonical embed and direct figure links", () => {
     assert.ok(text.includes(`#everstrat-${name}-diagram`));
 });
 
-test("Phase 2 has ten sections, matching home cards and four technical subsections", () => {
+test("root sections match home cards and retain four technical subsections", () => {
   const expected = [
     "introduction",
     "get-started",
@@ -212,6 +236,7 @@ test("Phase 2 has ten sections, matching home cards and four technical subsectio
     "reference",
     "developers",
     "operations",
+    "changelog",
     "contributing",
     "legal",
   ];
