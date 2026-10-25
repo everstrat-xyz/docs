@@ -44,7 +44,32 @@ jobs:
       - name: Set up Bun
         uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
-          bun-version-file: "package.json"
+          bun-version: "1.4.3"
           no-cache: true
       - name: Audit all locked Bun dependencies
-        run: bun audit --audit-level=low
+        shell: bash
+        env:
+          BUN_CONFIG_REGISTRY: https://registry.npmjs.org/
+        run: |
+          set -euo pipefail
+
+          audit_dir="$(mktemp -d "$RUNNER_TEMP/bun-audit.XXXXXX")"
+          trap 'rm -rf "$audit_dir"' EXIT
+
+          # Only dependency data comes from the pull request.
+          test -f bun.lock
+          test ! -L bun.lock
+          cp -- bun.lock "$audit_dir/bun.lock"
+
+          printf '%s\n' \
+            '{"name":"dependency-audit","private":true}' \
+            > "$audit_dir/package.json"
+
+          cat > "$audit_dir/bunfig.toml" <<'EOF'
+          env = false
+          [install]
+          registry = "https://registry.npmjs.org/"
+          EOF
+
+          cd "$audit_dir"
+          bun audit --audit-level=low

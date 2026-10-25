@@ -33,11 +33,23 @@ GitHub. Audits include development dependencies and fail on known vulnerabilitie
 of any severity or registry/network errors. They read lockfiles without installing
 project dependencies or running their lifecycle scripts.
 
-Run the same checks locally:
+CI pins the audit runtime to Bun 1.4.3 independently of the project's
+`packageManager`. Update that pin through a reviewed workflow change. On a fresh
+GitHub-hosted runner, the job copies only a regular, non-symlink `bun.lock` into a
+temporary directory and creates a minimal manifest and trusted Bun configuration.
+The audit uses `https://registry.npmjs.org/`; project `bunfig.toml`, `.npmrc`,
+scoped-registry settings, and `.env` files are not loaded. This prevents a pull
+request from redirecting advisory requests to a registry that reports no findings.
+
+Run an advisory check locally:
 
 ```sh
 bun audit --audit-level=low
 ```
+
+The local command honors your project and user registry configuration. To
+reproduce CI's isolation, run the workflow's audit step with `RUNNER_TEMP` set to
+a temporary directory and `BUN_CONFIG_REGISTRY=https://registry.npmjs.org/`.
 
 Inspect failed runs in Actions and configure GitHub Actions failure notifications
 for the maintainers who should receive them. Dependabot alert notifications are
