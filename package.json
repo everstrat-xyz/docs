@@ -21,7 +21,7 @@
     "check:fix": "bun run lint:fix && bun run typecheck"
   },
   "dependencies": {
-    "fumadocs-core": "16.17.7",
+    "fumadocs-core": "16.17.8",
     "fumadocs-mdx": "15.4.9",
     "fumadocs-ui": "16.17.7",
     "lucide-react": "^1.61.0",
