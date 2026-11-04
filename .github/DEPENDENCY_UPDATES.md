@@ -2,14 +2,15 @@
 
 ## Version updates
 
-Dependabot checks the root Bun project every day at 09:00 in Europe/Warsaw,
-including weekends. New releases must be at least seven days old before they are
-eligible for a version update. Updates are separate pull requests, with at most
-five open Bun version-update pull requests.
+Dependabot checks the root Bun project and GitHub Actions together every day at
+09:00 in Europe/Warsaw, including weekends. Version updates share one
+multi-ecosystem pull request, with at most one open version-update pull request.
+New releases must be at least seven days old before they are eligible for a
+version update. Action references are pinned to full commit SHAs; keep the version
+comments synchronized when updating them.
 
-GitHub Actions are checked on Mondays at 09:30 with a seven-day cooldown and a
-limit of two open version-update pull requests. Action references are pinned to
-full commit SHAs; keep the version comments synchronized when updating them.
+This grouping takes effect when the configuration is merged into the default
+branch.
 
 Review each pull request and run the relevant lint, type, test, and build checks
 before merging. The audit workflow checks advisories; it does not replace those
@@ -25,6 +26,9 @@ Bun supports Dependabot version updates, but GitHub currently does not support
 security updates for the Bun ecosystem or native dependency-graph ingestion of
 `bun.lock`. Alerts based on `package.json` do not provide complete coverage of the
 locked dependency tree. The Bun audit job checks that tree separately.
+
+Security updates use separate groups per ecosystem; the shared multi-ecosystem
+group applies to version updates only.
 
 The dependency audit workflow runs on dependency-related pull requests, relevant
 pushes to `main`, manually, and hourly at minute 17 UTC. Scheduled runs start
