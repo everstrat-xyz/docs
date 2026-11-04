@@ -1,29 +1,36 @@
 version: 2
 
-updates:
-  - package-ecosystem: "bun"
-    directory: "/"
+multi-ecosystem-groups:
+  dependencies:
     schedule:
       interval: "cron"
       cronjob: "0 9 * * *"
       timezone: "Europe/Warsaw"
-    cooldown:
-      default-days: 7
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 1
     commit-message:
       prefix: "chore"
       include: "scope"
 
-  - package-ecosystem: "github-actions"
+updates:
+  - package-ecosystem: "bun"
     directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:30"
-      timezone: "Europe/Warsaw"
+    patterns: ["*"]
+    multi-ecosystem-group: "dependencies"
     cooldown:
       default-days: 7
-    open-pull-requests-limit: 2
-    commit-message:
-      prefix: "chore"
-      include: "scope"
+    # Multi-ecosystem groups cover version updates; security updates group here.
+    groups:
+      security-updates:
+        applies-to: "security-updates"
+        patterns: ["*"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    patterns: ["*"]
+    multi-ecosystem-group: "dependencies"
+    cooldown:
+      default-days: 7
+    groups:
+      security-updates:
+        applies-to: "security-updates"
+        patterns: ["*"]
