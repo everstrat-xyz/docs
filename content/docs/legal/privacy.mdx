@@ -1,9 +1,9 @@
 ---
 title: Privacy Notice
-description: What Everstrat collects when you use the website, the app or these docs, why we collect it, who receives it, and how to have it deleted.
+description: How Everstrat handles newsletter signups, analytics, and app access, and how to manage or delete your data.
 ---
 
-Last updated: 15 October 2026
+Last updated: November 18, 2026
 
 This policy covers three websites: **everstrat.xyz**, **app.everstrat.xyz** and **docs.everstrat.xyz**.
 
@@ -31,6 +31,7 @@ We collect very little, and most of it is optional.
 - We never send your wallet address to any analytics service.
 - The YouTube videos on the roadmap do not contact Google until you press play.
 - If you give us your email for launch updates, we keep the email. We do not keep your IP address.
+- If you sign up for the Everstrat Journal, we keep your email and a record of your consent for future issues.
 - If you accept an app invite, we store your wallet address against that invite, including its email address when one is attached.
 
 ## What we collect
@@ -72,6 +73,16 @@ When you submit the form, your email address is also posted to a private Telegra
 We use the launch list to tell you when Everstrat launches. If an app invite is created for
 your email address, that address is also included in the invite record described below.
 We do not sell or rent your email address or add it to unrelated mailing lists.
+
+### Everstrat Journal signups
+
+If you sign up through the website footer or an article, we store your email
+address, a lowercased copy to prevent duplicates, the time you gave consent,
+the version of the consent text, and whether you signed up from an article or
+the footer. We keep this list for future issues of the Everstrat Journal.
+
+To limit abuse of the form, we use a keyed hash of the request IP address in
+a separate rate-limit table. The form does not attach the hash to your signup.
 
 <span id="team-access-cookie" className="block scroll-m-28" />
 
@@ -144,6 +155,7 @@ For readers in the EU and UK, our legal bases under the GDPR are:
 | --- | --- |
 | Analytics | Your consent, which you may withdraw at any time |
 | Launch updates email | Your consent, given by submitting the form |
+| Everstrat Journal signups | Your consent, given by checking the box and submitting the form |
 | Abuse-prevention hashes | Legitimate interest in keeping the signup form usable |
 | Invite access cookie | Strictly necessary for a service you asked for |
 | Server logs | Legitimate interest in security and availability |
@@ -153,7 +165,9 @@ For readers in the EU and UK, our legal bases under the GDPR are:
 | Data | Retention |
 | --- | --- |
 | Launch updates email | Until we send the launch announcement, or until you ask us to remove it, whichever comes first |
-| Abuse-prevention hashes | 12 months |
+| Everstrat Journal signups | Until you withdraw consent or we stop planning or publishing the Journal |
+| Journal rate-limit hashes | Entries expire after one day and are cleared as new signup requests arrive |
+| Launch waitlist abuse-prevention hashes | 12 months |
 | Analytics | 14 months, after which Google deletes it |
 | Invite access cookie and session validity | 14 days |
 | Invite records, including wallet and any linked email | Retained beyond invite and session expiry; expiry does not automatically delete these records |
@@ -170,11 +184,13 @@ Declining is remembered. We do not re-prompt people who have said no.
 
 To have your email removed from the launch list, write to **ping@everstrat.xyz** from that address, or with it in the message. We will delete the record and confirm.
 
+To withdraw your consent for the Everstrat Journal, email **ping@everstrat.xyz** and tell us the address you signed up with. We will remove it from the Journal list.
+
 ## Your rights
 
 If you are in the EU or UK, you have the right to ask us for a copy of the personal data we hold about you, to have it corrected, to have it deleted, to restrict or object to how we use it, and to receive it in a portable form. Similar rights apply in several other jurisdictions.
 
-This includes launch-list emails and off-chain invite records, which may link an email address
+This includes Journal and launch-list emails and off-chain invite records, which may link an email address
 to a wallet address. Write to **ping@everstrat.xyz** and we will act on your request within 30 days.
 
 We cannot act on requests concerning blockchain data, for the reasons given above.
@@ -190,7 +206,7 @@ These are every third party that receives any of it, and what each one gets:
 | Google | Analytics events, approximate location, device and browser details | Only if you accept analytics |
 | Google (YouTube) | Your IP address and its own cookies | Only if you press play on a roadmap video |
 | Telegram | Your email address, the time, and the signup source | When you join the launch list |
-| Neon | Stores the launch list and invite records, including wallet links and session-token hashes | When you join the launch list, or an invite is created or verified |
+| Neon | Stores Journal signups and rate-limit hashes, the launch list, and invite records including wallet links and session-token hashes | When you sign up for the Journal, join the launch list, or an invite is created or verified |
 | Vercel | Hosts all three sites and records request logs | Every visit |
 | Alchemy | Your wallet address and the chain reads the app makes | When you connect a wallet |
 | Goldsky | Subgraph queries made by the app | When you use the app |
@@ -200,8 +216,8 @@ We may also disclose data where the law requires it. If that ever happens we wil
 
 ## Where your data goes
 
-The sites are hosted by Vercel and run in its Frankfurt region. The database holding the launch
-list and invite records is operated by Neon. Both describe where the infrastructure runs,
+The sites are hosted by Vercel and run in its Frankfurt region. The database holding Journal signups, the launch
+list, and invite records is operated by Neon. Both describe where the infrastructure runs,
 not where anyone is based.
 
 Google, Telegram, Vercel, Alchemy, Goldsky and WalletConnect are all capable of processing data outside the EU, including in the United States. Where required, those transfers rely on the European Commission's standard contractual clauses or an equivalent mechanism offered by the provider.

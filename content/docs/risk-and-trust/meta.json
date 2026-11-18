@@ -1,6 +1,6 @@
 {
   "title": "Risk & Trust",
-  "icon": "TriangleAlert",
+  "icon": "TriangleExclamationPoint",
   "pages": [
     "key-risks",
     "trust-and-governance",

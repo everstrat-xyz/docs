@@ -17,6 +17,7 @@ export async function GET(
 
   return new ImageResponse(
     <SocialImage
+      eyebrow={page.slugs[0] === "legal" ? "Legal" : undefined}
       title={page.data.title}
       description={page.data.description ?? siteConfig.description}
     />,
