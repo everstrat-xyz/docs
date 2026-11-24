@@ -2,5 +2,5 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "installCommand": "bunx bun@1.4.3 install --frozen-lockfile",
-  "buildCommand": "bunx bun@1.4.3 run build"
+  "buildCommand": "if [ \"$(git rev-parse --is-shallow-repository 2>/dev/null)\" = true ]; then git fetch --unshallow --quiet || echo 'warning: could not unshallow; page lastModified may be inaccurate'; fi; bunx bun@1.4.3 run build"
 }

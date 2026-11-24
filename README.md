@@ -135,9 +135,10 @@ Optional verification tags can be supplied with:
 - `YANDEX_VERIFICATION`
 - `YAHOO_SITE_VERIFICATION`
 
-If you deploy on Vercel and want accurate Git-based last-modified timestamps during build, set:
-
-- `VERCEL_DEEP_CLONE=true`
+Page last-modified dates (sitemap `lastmod`, page metadata, JSON-LD) come from Git history.
+Vercel clones shallowly, which collapses older pages onto the oldest fetched commit. The
+`vercel.json` build command therefore unshallows the clone before building. Setting
+`VERCEL_DEEP_CLONE=true` is an equivalent project-level alternative.
 
 Recommended local and production setup:
 
@@ -306,7 +307,7 @@ When reconnecting the existing documentation project:
 - keep the existing environment variables, domains, and integrations
 - use Node.js 24 and the Next.js preset; `vercel.json` pins Bun 1.4.3 for frozen installs and Turbopack builds
 - retain `NEXT_PUBLIC_SITE_URL` for the production documentation domain 
-- set `VERCEL_DEEP_CLONE=true` if builds need complete Git history for last-modified timestamps
+- the `vercel.json` build command unshallows the clone so last-modified timestamps use complete Git history
 
 The repository migration does not change the Vercel project configuration.
 

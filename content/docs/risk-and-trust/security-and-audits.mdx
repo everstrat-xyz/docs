@@ -1,27 +1,47 @@
 ---
 title: Security & audits
-description: Evidence-based review coverage and the protections actually present in the deployed protocol.
+description: Third-party and internal audit coverage, remediation status, and the protections actually present in the deployed protocol.
 ---
 
-<Callout type="warn" title="No completed third-party audit report verified">
-  The repositories inspected on October 11, 2026 did not contain a completed independent
-  audit report identifying an auditor, reviewed commit, deployment coverage, and remediation
-  status. Do not describe the protocol as independently audited on the strength of tests,
-  internal reviews, or audit-fix PR titles.
+<Callout type="warn" title="Audited internally and by a third party; final report pending">
+  Everstrat has been audited internally and by a third party. Team Omega's report of
+  October 14, 2026 is **preliminary**; remediation is in progress and no completed (final)
+  third-party report exists yet. Audit coverage applies to the reviewed commit, not
+  automatically to later code or to every deployed build.
 </Callout>
 
 {/* Preserve published section links from the consolidated audit page. */}
 <span id="current-documentation-state" className="block scroll-m-28" />
+<span id="review-coverage" className="block scroll-m-28" />
 
-## Review coverage
+## Audit coverage
 
-Public development history contains review-driven fixes and tests. Those are useful evidence
-of engineering work, but do not substitute for an independent audit report.
-This documentation audit did not establish whether an engagement exists outside the reviewed
-repositories. It does not certify the deployed protocol or the v2 strategies.
+### Third-party audit: Team Omega (preliminary)
 
-When a report is published, link its artifact, auditor, exact code revision, covered contracts,
-and remediation status. Coverage of v1 does not automatically cover a different v2 build.
+*Status as of November 24, 2026.*
+
+| | |
+| --- | --- |
+| Auditor | [Team Omega](https://teamomega.eth.limo) |
+| Report | Preliminary report dated **October 14, 2026**, received November 12, 2026 |
+| Reviewed code | [`everstrat-xyz/contracts`](https://github.com/everstrat-xyz/contracts) main at commit [`157129b7c7f3db06275ecc6697ff0acfab3d9dbe`](https://github.com/everstrat-xyz/contracts/commit/157129b7c7f3db06275ecc6697ff0acfab3d9dbe) (October 1, 2026) |
+| Scope | Solidity contracts in `src/contracts` (~4,600 nSLOC): AMM, Controller, Converter, EVE, ExitQueue, Oracle, Registry and registry clients, StrategyManager, UniCLStrat, UniswapV3ConverterAdapter, Whitelist, and the keeper executors |
+| Findings | **0 high, 2 medium, 7 low, 1 informational** |
+| Remediation | **In progress.** Fixes for 8 of the 10 findings (G2–G4, G6–G10) are merged into the contracts `audit-fixes` branch; fixes for G1 and G5 are open for review. None is deployed to mainnet yet. |
+
+The two medium findings concern queued-exit pricing when a priced batch lapses (G1) and
+strategy NAV that ignores exit costs (G2). An Ethereum Foundation audit subsidy, administered
+through Areta, was approved on October 26, 2026.
+
+The reviewed commit predates UniCL v2 ([contracts PR #53](https://github.com/everstrat-xyz/contracts/pull/53))
+and the later strategy migrations, so the report does not by itself cover every deployed
+strategy build. This page will link the final report once it is published.
+
+### Internal audit
+
+The team audits the contracts internally. Public development history contains review-driven
+fixes, unit, fuzz, integration and mainnet-fork tests, and simulated governance payloads. Internal review
+complements but does not replace third-party coverage.
 
 ## Immutable core and configurable dependencies
 

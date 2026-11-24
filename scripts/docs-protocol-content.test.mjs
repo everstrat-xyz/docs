@@ -12,13 +12,16 @@ test("the deployment snapshot records the executed upgrade and strategy migratio
   assert.match(snapshot, /018: Controller 1\.1\.0[^\n]+\*\*Done\*\*/);
   assert.match(snapshot, /019: register v2[^\n]+\*\*Done\*\*/);
   assert.match(snapshot, /020: drain and remove v1[^\n]+\*\*Done\*\*/);
-  assert.match(snapshot, /Retired v1 address/);
-  const migration = compact("risk-and-trust/trust-and-governance.mdx");
   assert.match(
-    migration,
-    /October 19 snapshot.*?Controller 1\.1\.0 was active/,
+    snapshot,
+    /021: drain and remove UNI\/WETH v2[^\n]+\*\*Done\*\*/,
   );
-  assert.match(migration, /019 and 020 had executed/);
+  assert.match(snapshot, /Retired v1 address/);
+  assert.match(snapshot, /### Retired UNI\/WETH v2 strategy/);
+  const migration = compact("risk-and-trust/trust-and-governance.mdx");
+  assert.match(migration, /Controller 1\.1\.0 is active/);
+  assert.match(migration, /019 and 020 executed on October 19, 2026/);
+  assert.match(migration, /021 executed on October 28, 2026/);
   assert.match(
     migration,
     /\/operations\/current-deployments#strategy-migration/,
@@ -33,7 +36,7 @@ test("the role snapshot retains both verified Converter role assignments", () =>
   const snapshot = read("operations/current-deployments.mdx");
   assert.match(
     snapshot,
-    /\| `CONVERTER_CALLER_ROLE` \| Four registered v2 strategies \[listed above\]\(#registered-strategies\) \|/,
+    /\| `CONVERTER_CALLER_ROLE` \| Three registered v2 strategies \[listed above\]\(#registered-strategies\) \|/,
   );
   assert.match(
     snapshot,
@@ -41,8 +44,37 @@ test("the role snapshot retains both verified Converter role assignments", () =>
   );
   assert.match(
     compact("operations/current-deployments.mdx"),
-    /getRoleMemberCount\(\).*?getRoleMember\(\).*?snapshot block: four caller holders and one manager holder/,
+    /getRoleMemberCount\(\).*?getRoleMember\(\).*?snapshot block: three caller holders and one manager holder/,
   );
+  const strategies = snapshot
+    .split("## Registered strategies")[1]
+    .split("## Role holders")[0]
+    .match(/^\| [^|]+ \| [\d.]+% \| `0x[0-9a-fA-F]{40}` \|/gm);
+  assert.equal(strategies.length, 3);
+});
+
+test("audit status uses the agreed wording and names the dated preliminary report", () => {
+  const security = compact("risk-and-trust/security-and-audits.mdx");
+  assert.match(security, /audited internally and by a third party/i);
+  assert.match(security, /Team Omega/);
+  assert.match(security, /preliminary/i);
+  assert.match(security, /157129b7c7f3db06275ecc6697ff0acfab3d9dbe/);
+  assert.match(security, /0 high, 2 medium, 7 low, 1 informational/);
+  for (const path of [
+    "index.mdx",
+    "introduction/what-is-everstrat.mdx",
+    "get-started/overview.mdx",
+    "get-started/connect-wallet-and-supported-network.mdx",
+    "using-everstrat/depositing-and-minting.mdx",
+    "using-everstrat/exiting-and-redeeming.mdx",
+    "using-everstrat/fees-and-costs.mdx",
+    "legal/privacy.mdx",
+    "legal/risk-disclosure.mdx",
+    "reference/faq.mdx",
+    "risk-and-trust/key-risks.mdx",
+  ]) {
+    assert.doesNotMatch(read(path), /unaudited|not audited/i, path);
+  }
 });
 
 test("documented exit availability agrees with the pinned AMM liquidity reads", () => {

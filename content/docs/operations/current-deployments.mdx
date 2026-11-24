@@ -1,18 +1,20 @@
 ---
 title: Current deployments
-description: Ethereum mainnet settings, exit liquidity, role holders, and governance state at block 26,226,476.
+description: Ethereum mainnet settings, exit liquidity, role holders, and governance state at block 26,485,955.
 ---
 
 ## Verification boundary
 
-This read-only snapshot is pinned to Ethereum mainnet block **26,226,476**
-(**October 19, 2026, 11:59:35 UTC**), hash
-`0x8c8b9f242d4b1513b6bd8d6b8502db03ce3581a590508239980d63c28b138029`.
+This read-only snapshot is pinned to Ethereum mainnet block **26,485,955**
+(**November 24, 2026, 15:36:23 UTC**), hash
+`0x54582d83062a82ccb764ad668107a270d4ea2f2cc2ddb20779a304e8fad9ee63`.
 It does not refresh automatically.
 The app uses chain ID **1**.
 
 The tables above the [historical October 15 recheck](#migration-recheck-october-15-2026)
-all use the October 19 snapshot. The recheck preserves the earlier migration state.
+all use the November 24 snapshot. Every getter, balance, and role holder below was re-read at
+that block; the settings and exit-liquidity values were unchanged from the previous
+October 19 snapshot (block 26,226,476). The recheck preserves the earlier migration state.
 
 Entry remains invite-gated: `Whitelist.disabled()` returned `false`.
 A deployed address or a merged PR is not an announcement of unrestricted access.
@@ -63,16 +65,18 @@ immediate exit is available. This snapshot does not establish historical exit co
 
 ## Registered strategies
 
-`StrategyManager.strategies()` returned these four v2 strategy addresses, registered by 019.
-The v1 strategies were drained and removed by 020; see [Strategy migration](#strategy-migration).
+`StrategyManager.strategies()` returned these three v2 strategy addresses, registered by 019.
+The v1 strategies were drained and removed by 020, and the UNI/WETH v2 strategy by 021;
+see [Strategy migration](#strategy-migration).
 Registration does not guarantee that a strategy is healthy, funded, or executing at every moment.
 
-| Pool | Fee tier | Registered strategy |
-| --- | --- | --- |
-| USDC/WETH | 0.30% | `0xfbcC73fA67F50D38FB318991C6CAbD5A6f64014A` |
-| USDC/WETH | 0.01% | `0x63B68CC99991429CA8a808125e446990Ae7fe669` |
-| WETH/USDT | 0.30% | `0xE80bfd65A55855ead8Cb5f7040031426CB718Cc5` |
-| UNI/WETH | 0.30% | `0xFC888a499c4172e393A258FbC6cAd1475a7e4129` |
+| Pool | Fee tier | Registered strategy | Deposit / withdrawal weight |
+| --- | --- | --- | --- |
+| USDC/WETH | 0.30% | `0xfbcC73fA67F50D38FB318991C6CAbD5A6f64014A` | 40 / 40 |
+| USDC/WETH | 0.01% | `0x63B68CC99991429CA8a808125e446990Ae7fe669` | 15 / 15 |
+| WETH/USDT | 0.30% | `0xE80bfd65A55855ead8Cb5f7040031426CB718Cc5` | 45 / 45 |
+
+Weights were read from `StrategyManager.depositWeight()` and `withdrawalWeight()` and sum to 100.
 
 ## Role holders
 
@@ -82,12 +86,12 @@ Registration does not guarantee that a strategy is healthy, funded, or executing
 | `SECURITY_ROLE` | `0x7c128C1CF39822B4133F8E067F4bF14999c49846` |
 | `KEEPER_ROLE` | QueueKeeperExecutor and StrategyKeeperExecutor |
 | `MINTER_ROLE` | AMM and StrategyManager |
-| `CONVERTER_CALLER_ROLE` | Four registered v2 strategies [listed above](#registered-strategies) |
+| `CONVERTER_CALLER_ROLE` | Three registered v2 strategies [listed above](#registered-strategies) |
 | `CONVERTER_CALLER_MANAGER_ROLE` | [Converter](/reference/contract-addresses#core-contracts-and-keeper-executors) |
 | `DEFAULT_ADMIN_ROLE` | No holders |
 
 The two Converter role assignments were read through Registry's `getRoleMemberCount()`
-and `getRoleMember()` at the snapshot block: four caller holders and one manager holder.
+and `getRoleMember()` at the snapshot block: three caller holders and one manager holder.
 
 Both executors allow the Mimic caller `0x41153f0c36f8Fb5c38396573dDB487AC95a98256`.
 This is an executor caller allowlist. The account itself holds no `KEEPER_ROLE`.
@@ -102,6 +106,7 @@ Allowlisting alone does not prove uninterrupted off-chain task execution.
 | [018: Controller 1.1.0](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/018-controller-upgrade-v1.1.0) | **Done**, executed | Added ADMIN access to the single-strategy withdrawal function (funds return to Controller only) |
 | [019: register v2 strategies](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/019-strategy-manager-register-unicl-v2-strategies) | **Done**, executed | Registered the four v2 strategies |
 | [020: drain and remove v1](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/020-strategy-manager-drain-remove-unicl-v1-strategies) | All four operations **Done**, executed | Moved the four v1 strategies' funds into Controller and removed them |
+| [021: drain and remove UNI/WETH v2](https://github.com/everstrat-xyz/governance/tree/45b604f38f647e4d019b8cb12f6bc79c19e11130/021-strategy-manager-drain-remove-uni-weth-strategy) | **Done**, executed | Drained the UNI/WETH v2 strategy into Controller, paused it, and force-removed it |
 
 Record 018 executed at block **26,176,319** (**October 12, 12:13:23 UTC**), in
 [this transaction](https://etherscan.io/tx/0xd3e005e636591e9c91c9c237be11d778baa1b31a18ca6b7af4ddb3750a9e2c33).
@@ -119,6 +124,15 @@ The Controller proxy's implementation slot points to
 | `0xe680e96963678090ac5854516999bf7c770284e622e66c014e04c689b9265bd9` | 020 | 26,226,430 | [`0x13b895e8…6959`](https://etherscan.io/tx/0x13b895e816a3489ec678398f7ed367b0b2921a55296359797e0f06c0b7be6959) |
 | `0x93ee86d5f12f2b739647a886d51e7dce3baeb77c02809d4c0d10fcf3b81f4cd2` | 020 | 26,226,432 | [`0x0bb24561…b44f`](https://etherscan.io/tx/0x0bb24561cec0a6ad46d9d022a67999481851193dbcd80895c2caaf275c1eb44f) |
 
+021 was scheduled at block **26,248,274** (**October 22, 12:52:23 UTC**,
+[transaction](https://etherscan.io/tx/0xec14e43c4eb5a9867f699138b700b3c0ead396f5492874f258e9baad76a8fd32))
+and executed as one batch at block **26,290,800** (**October 28, 2026, 11:02:47 UTC**), in
+[this transaction](https://etherscan.io/tx/0x16b86482e49dca1ef284afc2a14625ba4f22edcef26fc1857ff03b32a901a8d4),
+operation `0xa8bf3f7281633b88cfe2f5c14e59b149afff1820a0b57a657b7935c42a7f9656`.
+The batch withdrew **0.461511 ETH** to Controller, paused the strategy, and called
+`forceRemoveStrategy`, whose `StrategyForceRemoved` event reported a residual NAV of **0**.
+Keeper deposits then route Controller ETH above the reserve to the three remaining strategies by weight.
+
 The linked proposal files describe intended payloads; their older status prose is not
 the authority for this pinned chain state.
 
@@ -134,13 +148,19 @@ held no `CONVERTER_CALLER_ROLE`, and reported `navInETH() = 0`:
 | WETH/USDT 0.30% | `0x3Fb6B9174427CA4FF38728398F4F4CB526F66501` |
 | UNI/WETH 0.30% | `0x956fE55DB50527E75c1fcA679adE509AD89cAFDd` |
 
+### Retired UNI/WETH v2 strategy
+
+At the snapshot block the UNI/WETH 0.30% v2 strategy `0xFC888a499c4172e393A258FbC6cAd1475a7e4129`,
+removed by 021, was absent from `StrategyManager.strategies()`, held no `CONVERTER_CALLER_ROLE`,
+reported `paused() = true` and `navInETH() = 0`, and held no ETH, WETH, or UNI.
+
 ## Migration recheck: October 15, 2026
 
 A read-only recheck of **Controller version, timelock states, and the registered strategy list**
 was pinned to Ethereum mainnet block **26,199,960**, **October 15, 2026, 19:18:11 UTC**, hash
 `0x47bf3b2566e613ed44e5109dfcef849681ff828f06643dfae3a5f7440bbd0a08`.
 This historical check covered only the three reads named above. The current balances,
-settings, and role holders use the October 19 snapshot at the top of this page.
+settings, and role holders use the November 24 snapshot at the top of this page.
 
 | Read | Result at block 26,199,960 |
 | --- | --- |
