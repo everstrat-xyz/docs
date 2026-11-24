@@ -5,6 +5,37 @@ description: Strategy improvements, pool additions, and migrations.
 
 <ChangeEntry category="Strategies" status="On-chain">
 
+## 2026-10-28
+
+### UNI/WETH strategy removed; basket is now three strategies
+
+Governance 021 drained the UNI/WETH 0.30% v2 strategy into Controller, paused it, and removed it.
+The basket now holds three strategies with deposit and withdrawal weights of **40 / 15 / 45**
+(USDC/WETH 0.30%, USDC/WETH 0.01%, WETH/USDT 0.30%).
+
+- About **0.4615 ETH** returned to Controller; funds stayed inside the protocol and in NAV.
+- The removal recorded **zero** residual NAV.
+- UNI/WETH was the only strategy with a non-stable paired token and the only one with a negative
+  realized ETH return over the v1 period.
+
+<details className="change-details">
+<summary>Execution evidence</summary>
+
+**Executed on mainnet.** Operation `0xa8bf3f72…42a7f9656` was scheduled at block **26,248,274**
+(October 22, 12:52:23 UTC) and executed as one batch at block **26,290,800**
+(**October 28, 11:02:47 UTC**) in
+[this transaction](https://etherscan.io/tx/0x16b86482e49dca1ef284afc2a14625ba4f22edcef26fc1857ff03b32a901a8d4):
+`withdrawFromStrategy` twice (0.461511479635619044 ETH), `pause()`, then `forceRemoveStrategy`
+(`StrategyForceRemoved` reported NAV 0). The [November 24 snapshot](/operations/current-deployments#registered-strategies)
+confirms three registered strategies and three `CONVERTER_CALLER_ROLE` holders.
+Source: [governance #34](https://github.com/everstrat-xyz/governance/pull/34).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Strategies" status="On-chain">
+
 ## 2026-10-19
 
 ### UniCL v2 migration executed

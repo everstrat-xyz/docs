@@ -4,6 +4,69 @@ description: Protocol upgrades, permissions, and configuration changes.
 ---
 
 
+<ChangeEntry category="Contracts" status="Code merged">
+
+## 2026-11-21
+
+### Audit fixes merged for review
+
+Fixes for 8 of the 10 findings in Team Omega's preliminary audit are merged into the contracts
+`audit-fixes` branch. They are **not on main and not deployed**; mainnet behavior is unchanged.
+
+- G2: strategy NAV for the paired token is marked net of exit cost.
+- G4, G6, G7, G9: stranded supported ERC-20s can be converted to ETH by governance, capped or failed strategy shares are re-split, UniCLStrat pays out partially when its swap reverts, and small redemption shortfalls round up to `minWithdrawETH`.
+- G3, G8, G10: test coverage, upstream GPL-2.0-or-later license on adapted Uniswap files, and documented batch payment order.
+- G1 (live price at payout) and G5 (batch settlement cost) are open for review.
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+**Merged** into `audit-fixes` between November 19 and 21, 2026:
+[#59](https://github.com/everstrat-xyz/contracts/pull/59) (G2), [#61](https://github.com/everstrat-xyz/contracts/pull/61) (G3), [#62](https://github.com/everstrat-xyz/contracts/pull/62) (G4), [#65](https://github.com/everstrat-xyz/contracts/pull/65) (G6),
+[#66](https://github.com/everstrat-xyz/contracts/pull/66) (G7), [#67](https://github.com/everstrat-xyz/contracts/pull/67) (G8), [#68](https://github.com/everstrat-xyz/contracts/pull/68) (G9), [#69](https://github.com/everstrat-xyz/contracts/pull/69) (G10).
+Open: [#60](https://github.com/everstrat-xyz/contracts/pull/60) (G1), [#64](https://github.com/everstrat-xyz/contracts/pull/64) (G5). Activation requires a merge to main, deployment,
+and governance execution; see [Security & audits](/risk-and-trust/security-and-audits#audit-coverage).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Contracts" status="Audit">
+
+## 2026-11-12
+
+### Preliminary third-party audit received
+
+Team Omega delivered its preliminary audit report of the Everstrat contracts. It found **no
+high-severity issues**, 2 medium, 7 low, and 1 informational.
+
+- Reviewed code: `everstrat-xyz/contracts` main at commit `157129b7` (October 1, 2026).
+- Scope: the Solidity contracts in `src/contracts`, about 4,600 nSLOC.
+- Remediation is in progress; the final report is pending.
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+The report is dated October 14, 2026 and was received November 12, 2026. Reviewed commit:
+[`157129b7c7f3db06275ecc6697ff0acfab3d9dbe`](https://github.com/everstrat-xyz/contracts/commit/157129b7c7f3db06275ecc6697ff0acfab3d9dbe).
+The reviewed commit predates UniCL v2. Findings, scope, and remediation status are tracked in
+[Security & audits](/risk-and-trust/security-and-audits#audit-coverage).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="Contracts" status="Audit">
+
+## 2026-10-26
+
+### Third-party audit funded
+
+An Ethereum Foundation audit subsidy, administered through Areta, was approved for the
+Everstrat contracts audit.
+
+</ChangeEntry>
+
 <ChangeEntry category="Contracts" status="On-chain">
 
 ## 2026-10-12

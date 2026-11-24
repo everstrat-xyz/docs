@@ -61,21 +61,23 @@ The registered instance list can change through governance. See [Live strategies
 ## Live strategies
 
 The canonical [dated deployment snapshot](/operations/current-deployments#registered-strategies)
-lists the registered strategy addresses. The pool set recorded there is:
+lists the registered strategy addresses and weights. The pool set recorded there is:
 
 | Uniswap V3 pool | Fee tier | Pool address |
 | --- | --- | --- |
 | USDC / WETH | 0.30% | `0x8ad599c3A0ff1De082011EFDDc58f1908eb6e6D8` |
 | USDC / WETH | 0.01% | `0xE0554a476A092703abdB3Ef35c80e0D76d32939F` |
 | WETH / USDT | 0.30% | `0x4e68Ccd3E89f51C3074ca5072bbAC773960dFa36` |
-| UNI / WETH | 0.30% | `0x1d42064Fc4Beb5F8aAF85F4617AE8b3b5B8Bd801` |
+
+The UNI / WETH 0.30% pool (`0x1d42064Fc4Beb5F8aAF85F4617AE8b3b5B8Bd801`) left the basket when
+governance 021 drained and removed its strategy on October 28, 2026.
 
 The strategy list can change through governance; `StrategyManager.strategies()` is the source of
 truth. The app's Metrics page shows each strategy's pool and capital, and links to the pool
 on Uniswap.
 
 Each position can hold both tokens. The split depends on the pool price, tick ranges, idle inventory,
-and rebalances; it is not a fixed 50/50 allocation. Paired assets include USDC, USDT, and UNI.
+and rebalances; it is not a fixed 50/50 allocation. Paired assets in the current basket are USDC and USDT.
 
 ### UniCL v2 migration status
 
@@ -85,7 +87,8 @@ and a full unwind for near-full withdrawals. Shared logic lives in `UniCLStratLi
 
 018 upgraded the Controller to 1.1.0, enabling the timelock's single-strategy withdrawal.
 019 registered the v2 replacements on the same four pools, and 020 drained and removed v1.
-Both executed on October 19, 2026; the dated snapshot confirms that only the v2 strategies are
+Both executed on October 19, 2026. 021 then drained and removed the UNI/WETH v2 strategy on
+October 28, 2026; the dated snapshot confirms that only the three remaining v2 strategies are
 registered. See [Current deployments](/operations/current-deployments#strategy-migration) for
 operation ids, execution transactions, and the retired v1 addresses.
 

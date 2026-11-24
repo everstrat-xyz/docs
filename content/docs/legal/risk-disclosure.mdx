@@ -1,14 +1,14 @@
 ---
 title: Risk Disclosure
-description: What you are accepting by using Everstrat. Unaudited software in a testing phase, with no guarantee of yield, liquidity, redemption, maintenance or continuation.
+description: What you are accepting by using Everstrat. Experimental software in a testing phase, audited internally and by a third party, with no guarantee of yield, liquidity, redemption, maintenance or continuation.
 ---
 
-Last updated: 16 November 2026
+Last updated: 24 November 2026
 
 <Callout type="warn" title="Testing phase — treat as a test protocol">
   Everstrat is deployed on **Ethereum mainnet** (chain id 1), but it is in a **testing phase** and
-  should be treated as a **test protocol**. Entry is invite-gated, the software is experimental and
-  unaudited, and deposits are real ETH at real risk. Do not deposit more than you can afford to
+  should be treated as a **test protocol**. Entry is invite-gated and the software is experimental.
+  It has been [audited internally and by a third party](/risk-and-trust/security-and-audits) (Team Omega preliminary report, October 14, 2026; fixes in progress). Deposits are real ETH at real risk. Do not deposit more than you can afford to
   lose entirely.
 </Callout>
 
@@ -27,8 +27,8 @@ These sites are operated by **everstrat.xyz**. Questions about this statement go
 
 Everstrat is in a **testing phase**. The contracts run on Ethereum mainnet, so the ETH you deposit
 is real and so are any losses. Being on mainnet does not make this a production system: the
-protocol should be treated as a **test protocol** — experimental, invite-gated, unaudited, and
-subject to change or suspension without notice.
+protocol should be treated as a **test protocol** — experimental, invite-gated, audited internally and by a
+third party with fixes still in progress, and subject to change or suspension without notice.
 
 Because real funds are now involved, **verifying you are on the official deployment matters.**
 Only interact with the addresses listed in [Contract addresses](/reference/contract-addresses).
@@ -36,15 +36,23 @@ Anyone asking you to send funds to a different "Everstrat" contract, site or tok
 you. Treat messages directing you to unofficial contracts, sites, tokens, or accounts as
 impersonation attempts, even if they copy this documentation.
 
-## The code is not audited
+<span id="the-code-is-not-audited" className="block scroll-m-28" />
 
-No third party has audited the smart contracts. There is no completed audit report, no bug bounty
+## Audit status
+
+The smart contracts have been audited internally and by a third party. Team Omega delivered a
+**preliminary** report on October 14, 2026, covering the `everstrat-xyz/contracts` main branch at
+commit `157129b7`. It reported no high-severity issues, 2 medium, 7 low and 1 informational.
+Fixes are in progress and are not yet deployed; there is no final report yet.
+
+An audit lowers risk but does not remove it. It covers a specific code revision, not every later
+change or configuration, and it does not guarantee the code is free of bugs. There is no bug bounty
 and no formal verification.
 
 Verified source code on a block explorer means the published source matches the deployed bytecode.
 It does not mean the code is correct, and it is not a substitute for an audit.
 
-The current position on audits, and what would have to happen before one, is described in
+The current audit scope, findings and remediation status are described in
 [Security and audits](/risk-and-trust/security-and-audits).
 
 ## Your deposit is exposed to strategy performance

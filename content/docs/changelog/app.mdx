@@ -6,6 +6,226 @@ description: New features, improvements, and fixes in the Everstrat app.
 
 <ChangeEntry category="App" status="Released">
 
+## 2026-11-19
+
+### Faster public metrics and protected link previews
+
+Public earnings data now loads from a short edge cache, and social-preview routes are protected against request floods.
+
+- The earnings analytics route returns a bounded public cache header.
+- Preview images and snapshot metadata are rate-limited per IP, like sign-in and invite routes.
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+**Production deployment.** Deployment `7909473916` reported success at **09:41:50 UTC** (commit `8184071`); `7915433641` reported success at **14:07:01 UTC** (commit `ec75cbf`).
+
+Source: [app #50](https://github.com/everstrat-xyz/app/pull/50), [app #51](https://github.com/everstrat-xyz/app/pull/51).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="App" status="Released">
+
+## 2026-11-18
+
+### Newsletter signups in Admin
+
+Admins can review newsletter signups, including consent time and version, in a read-only Admin tab.
+
+- Emails are deduplicated after normalization and listed in pages of 50.
+- Signups are stored in an isolated schema with their own rate limits.
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+**Production deployment.** Deployment `7893423856` reported success at **19:08:17 UTC** (commit `d315375`).
+
+Source: [app #53](https://github.com/everstrat-xyz/app/pull/53).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="App" status="Released">
+
+## 2026-11-05
+
+### See what the strategies hold, and personalized referral codes
+
+Metrics now shows the live token composition behind the protocol's strategies and how those token values changed over time. Admins can also create five-character referral codes for partners.
+
+- New token composition and value history cards sit between the return/NAV and flows/allocation sections.
+- A partner code is assigned to its owner on first signed activation; later wallets using it become that owner's direct referrals.
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+**Production deployment.** Deployment `7578218997` reported success at **15:47:48 UTC** (commit `257b959`); `7578467047` reported success at **15:58:00 UTC** (commit `3682110`).
+
+Source: [app #47](https://github.com/everstrat-xyz/app/pull/47), [app #48](https://github.com/everstrat-xyz/app/pull/48).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="App" status="Released">
+
+## 2026-11-02
+
+### Safer transaction-recovery configuration
+
+Follow-up to the October 30 recovery fix: the app now warns when its main and recovery RPC
+endpoints are the same, because missing-transaction recovery needs two independent endpoints.
+
+- Reviewed dependency updates are included.
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+**Production deployment.** Deployment `7495467113` reported success at **15:02:09 UTC** (commit `437c052`).
+
+Source: [app #41](https://github.com/everstrat-xyz/app/pull/41).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="App" status="Released">
+
+## 2026-10-30
+
+### Stuck transactions recover on their own
+
+The app now confirms a transaction's real on-chain outcome when a public RPC loses track of it, it stays pending, the wallet replaces it, or it confirms after the original screen stopped waiting.
+
+- A confirmation found later, after a reload or in another tab, completes the original form consistently.
+- **View status** and the Etherscan link stay available while background checks run.
+- A missing transaction can be released with an explicit **Stop tracking and unlock**; this does not cancel or resend it.
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+**Production deployment.** Deployment `7441635021` reported success at **15:06:45 UTC** (commit `1f8a7e4`).
+
+Source: [app #40](https://github.com/everstrat-xyz/app/pull/40).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="App" status="Released">
+
+## 2026-10-27
+
+### Simpler strategy charts and sign-out on disconnect
+
+Strategy metrics are easier to read, and disconnecting your wallet now ends your app session.
+
+- Deposits and Withdrawals charts are folded into the Capital tooltip; strategy charts gain USD/ETH and 7D–1Y controls.
+- Disconnecting a wallet revokes the invite session and expires its cookie.
+- Sign-in verification and invite endpoints are rate-limited to stop outbound RPC amplification.
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+**Production deployment.** Deployment `7360398528` reported success at **13:56:11 UTC** (commit `e32a786`); `7362446476` reported success at **15:18:28 UTC** (commit `ecc6c2f`); `7363940546` reported success at **16:17:32 UTC** (commit `1f1f971`); `7369793118` reported success at **20:36:46 UTC** (commit `d7192ef`).
+
+Source: [app #22](https://github.com/everstrat-xyz/app/pull/22), [app #23](https://github.com/everstrat-xyz/app/pull/23), [app #35](https://github.com/everstrat-xyz/app/pull/35), [app #36](https://github.com/everstrat-xyz/app/pull/36).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="App" status="Released">
+
+## 2026-10-26
+
+### LP fee APR and cumulative fees per strategy
+
+Metrics replaces the Net Gain headline and per-strategy net-change charts with fee income read from Ethereum.
+
+- 24-hour and 7-day LP fee APR are calculated on-chain.
+- Cumulative fees earned appear alongside EVE redemption-price returns.
+- Admin sign-in challenges are protected from unauthenticated database exhaustion, and Dependabot audits now run on dependencies.
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+**Production deployment.** Deployment `7333927633` reported success at **14:05:43 UTC** (commit `246c699`); `7334488920` reported success at **14:29:09 UTC** (commit `56b1b1e`); `7341649172` reported success at **19:35:29 UTC** (commit `d9d57c4`).
+
+Source: [app #20](https://github.com/everstrat-xyz/app/pull/20), [app #21](https://github.com/everstrat-xyz/app/pull/21), [app #29](https://github.com/everstrat-xyz/app/pull/29).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="App" status="Released">
+
+## 2026-10-25
+
+### Admin referral analytics
+
+Admins can track referral attribution, conversion, and exact ETH flows with date filters, search, and drilldowns over block-pinned snapshots.
+
+- Launch waitlist signups are limited per IP.
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+**Production deployment.** Deployment `7313535822` reported success at **13:09:24 UTC** (commit `0bd3577`); `7315248930` reported success at **15:35:27 UTC** (commit `a6212da`).
+
+Source: [app #18](https://github.com/everstrat-xyz/app/pull/18), [app #19](https://github.com/everstrat-xyz/app/pull/19).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="App" status="Released">
+
+## 2026-10-23
+
+### Invite friends with a personal referral code
+
+Registered wallets get a permanent five-character code to invite friends and can track direct referrals in Portfolio.
+
+- Friends accept through the same invite form as admin invitations and sign a gasless wallet message.
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+**Production deployment.** Deployment `7277426430` reported success at **11:49:28 UTC** (commit `4073570`).
+
+Source: [app #17](https://github.com/everstrat-xyz/app/pull/17).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="App" status="Released">
+
+## 2026-10-20
+
+### Metrics shows one tab per live strategy
+
+After the v1 → v2 migration, Metrics hides retired strategy tabs and continues each pool's history in its v2 strategy.
+
+- The Metrics page went from 8 strategy tabs back to one per registered strategy.
+
+<details className="change-details">
+<summary>Details & sources</summary>
+
+**Production deployment.** Deployment `7202394115` reported success at **14:28:12 UTC** (commit `31d9034`).
+
+Source: [app #16](https://github.com/everstrat-xyz/app/pull/16).
+
+</details>
+
+</ChangeEntry>
+
+<ChangeEntry category="App" status="Released">
+
 ## 2026-10-14
 
 ### See protocol earnings in Metrics
